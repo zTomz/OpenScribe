@@ -37,6 +37,14 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
   @override
   Widget build(BuildContext context) {
     List<Document> documents = ref.watch(noteProvider);
+    final windowSize = MediaQuery.of(context).size;
+    final double tabSize = min(
+      175,
+      max(
+        82,
+        windowSize.width * 0.7 / documents.length - 10,
+      ),
+    );
 
     return Scaffold(
       body: Column(
@@ -47,8 +55,8 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
               children: [
                 SizedBox(
                   width: min(
-                    MediaQuery.of(context).size.width * 0.7,
-                    documents.length * 210,
+                    windowSize.width * 0.7,
+                    documents.length * (tabSize + 10),
                   ),
                   child: ScrollConfiguration(
                     behavior: ScrollConfiguration.of(context).copyWith(
@@ -77,7 +85,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
                           ),
                           child: Container(
                             height: 35,
-                            width: 200,
+                            width: tabSize,
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 10.0),
                             decoration: BoxDecoration(
@@ -93,7 +101,10 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Expanded(
-                                  child: Text(documents[index].title),
+                                  child: Text(
+                                    documents[index].title,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                                 InkWell(
                                   onTap: () {
