@@ -38,6 +38,7 @@ dependencies:
   flutter_hooks: ^0.20.1
   file_picker: ^5.5.0
   uuid: ^4.1.0
+  adaptive_theme: ^3.4.0
 
 dev_dependencies:
   flutter_test:

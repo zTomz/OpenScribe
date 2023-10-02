@@ -37,6 +37,8 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     List<Document> documents = ref.watch(noteProvider);
     final windowSize = MediaQuery.of(context).size;
     final double tabSize = min(
@@ -48,6 +50,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
     );
 
     return Scaffold(
+      backgroundColor: colorScheme.background,
       body: Column(
         children: [
           SizedBox(
@@ -95,7 +98,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
                               ),
                               border: Border.all(
                                 width: 2,
-                                color: MyColors.grey,
+                                color: colorScheme.primary,
                               ),
                             ),
                             child: Row(
@@ -143,11 +146,11 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
                                           ),
                                   hoverColor: MyColors.grey.withOpacity(0.3),
                                   borderRadius: BorderRadius.circular(180),
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(4),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4),
                                     child: Icon(
                                       Icons.close_rounded,
-                                      color: MyColors.grey,
+                                      color: colorScheme.primary,
                                       size: 20,
                                     ),
                                   ),
@@ -160,8 +163,11 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
                     ),
                   ),
                 ),
-                const Expanded(
-                  child: WindowCaption(),
+                Expanded(
+                  child: WindowCaption(
+                    backgroundColor: colorScheme.background,
+                    brightness: colorScheme.brightness,
+                  ),
                 ),
               ],
             ),

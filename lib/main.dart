@@ -1,13 +1,14 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:openscribe/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
-import 'package:openscribe/constants.dart';
 import 'package:openscribe/pages/note_editing_page.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await windowManager.ensureInitialized();
   await Window.initialize();
 
@@ -30,41 +31,65 @@ void main() async {
     await windowManager.setPreventClose(true);
   });
 
-  runApp(const ProviderScope(child: MyApp()));
+  AdaptiveThemeMode? savedThemeMode = await AdaptiveTheme.getThemeMode();
+
+  runApp(
+    ProviderScope(
+      child: MyApp(
+        savedThemeMode: savedThemeMode,
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AdaptiveThemeMode? savedThemeMode;
+
+  const MyApp({super.key, this.savedThemeMode});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      builder: (context, child) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: DragToResizeArea(
-            enableResizeEdges: const [
-              ResizeEdge.topLeft,
-              ResizeEdge.top,
-              ResizeEdge.topRight,
-              ResizeEdge.left,
-              ResizeEdge.right,
-              ResizeEdge.bottomLeft,
-              ResizeEdge.bottomLeft,
-              ResizeEdge.bottomRight,
-            ],
-            child: child!,
+    return AdaptiveTheme(
+      light: ThemeData(
+        useMaterial3: true,
+        colorScheme: const ColorScheme.light(),
+      ),
+      dark: ThemeData(
+        useMaterial3: true,
+        colorScheme: const ColorScheme.dark(),
+      ),
+      // debugShowFloatingThemeButton: true,
+      initial: savedThemeMode ?? AdaptiveThemeMode.system,
+      builder: (theme, darkTheme) {
+        return MaterialApp(
+          builder: (context, child) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: DragToResizeArea(
+                enableResizeEdges: const [
+                  ResizeEdge.topLeft,
+                  ResizeEdge.top,
+                  ResizeEdge.topRight,
+                  ResizeEdge.left,
+                  ResizeEdge.right,
+                  ResizeEdge.bottomLeft,
+                  ResizeEdge.bottomLeft,
+                  ResizeEdge.bottomRight,
+                ],
+                child: child!,
+              ),
+            );
+          },
+          title: 'Open Scribe',
+          debugShowCheckedModeBanner: false,
+          theme: theme,
+          darkTheme: darkTheme,
+          home: const MainScreen(
+            child: NoteEditingPage(),
           ),
         );
       },
-      title: 'Open Scribe',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: MyColors.blue),
-      ),
-      home: const MainScreen(child: NoteEditingPage()),
     );
   }
 }

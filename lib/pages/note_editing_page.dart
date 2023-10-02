@@ -12,6 +12,8 @@ class NoteEditingPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     Document note = ref.watch(currentNoteProvider);
 
     final titleController = useTextEditingController();
@@ -27,8 +29,6 @@ class NoteEditingPage extends HookConsumerWidget {
           "",
         );
     noteController.text = note.text;
-
-    print(note);
 
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
@@ -58,15 +58,9 @@ class NoteEditingPage extends HookConsumerWidget {
       child: Focus(
         autofocus: true,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Container(
+          backgroundColor: colorScheme.background,
+          body: Padding(
             padding: const EdgeInsets.all(8),
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-            ),
             child: Column(
               children: [
                 SizedBox(
@@ -115,7 +109,10 @@ class NoteEditingPage extends HookConsumerWidget {
                         onPressed: () async {
                           ref.read(noteProvider.notifier).createNew();
                         },
-                        icon: SvgPicture.asset("assets/icons/document.svg"),
+                        icon: SvgPicture.asset(
+                          "assets/icons/document.svg",
+                          color: colorScheme.onBackground,
+                        ),
                         tooltip: "New file",
                       ),
                       const SizedBox(width: 10),
@@ -141,7 +138,10 @@ class NoteEditingPage extends HookConsumerWidget {
                             );
                           }
                         },
-                        icon: SvgPicture.asset("assets/icons/disk.svg"),
+                        icon: SvgPicture.asset(
+                          "assets/icons/disk.svg",
+                          color: colorScheme.onBackground,
+                        ),
                         tooltip: "Save",
                       ),
                       const SizedBox(width: 10),
@@ -165,7 +165,10 @@ class NoteEditingPage extends HookConsumerWidget {
                             );
                           }
                         },
-                        icon: SvgPicture.asset("assets/icons/folder.svg"),
+                        icon: SvgPicture.asset(
+                          "assets/icons/folder.svg",
+                          color: colorScheme.onBackground,
+                        ),
                         tooltip: "Open",
                       ),
                     ],
