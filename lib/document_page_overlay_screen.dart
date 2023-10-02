@@ -5,20 +5,22 @@ import 'dart:ui';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:openscribe/constants.dart';
 import 'package:openscribe/models/document.dart';
-import 'package:openscribe/pages/note_editing_page.dart';
+import 'package:openscribe/pages/document_editing_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openscribe/widgets/documents_tab.dart';
 import 'package:window_manager/window_manager.dart';
 
-class MainScreen extends ConsumerStatefulWidget {
-  const MainScreen({super.key});
+class DocumentPageOverlayScreen extends ConsumerStatefulWidget {
+  const DocumentPageOverlayScreen({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _MainScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _DocumentPageOverlayScreenState();
 }
 
-class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
+class _DocumentPageOverlayScreenState
+    extends ConsumerState<DocumentPageOverlayScreen> with WindowListener {
   @override
   void initState() {
     super.initState();
@@ -37,7 +39,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    List<Document> documents = ref.watch(noteProvider);
+    List<Document> documents = ref.watch(documentProvider);
     final windowSize = MediaQuery.of(context).size;
     final double tabSize = min(
       175,
@@ -113,7 +115,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
                     },
                     style: TextButton.styleFrom(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(2),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                     ),
                     child: const Text("File"),
@@ -121,8 +123,8 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
                   menuChildren: [
                     MenuItemButton(
                       onPressed: () {
-                        ref.read(currentNoteProvider.notifier).state =
-                            ref.read(noteProvider.notifier).createNew();
+                        ref.read(currentDocumentProvider.notifier).state =
+                            ref.read(documentProvider.notifier).createNew();
                       },
                       child: Row(
                         children: [
@@ -146,20 +148,20 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
                     MenuItemButton(
                       onPressed: () async {
                         try {
-                          final currentNote =
-                              ref.read(currentNoteProvider.notifier).state;
+                          final currentDocument =
+                              ref.read(currentDocumentProvider.notifier).state;
 
-                          ref.read(noteProvider.notifier).changeText(
-                                currentNote.text,
-                                currentNote.uuid,
+                          ref.read(documentProvider.notifier).changeText(
+                                currentDocument.text,
+                                currentDocument.uuid,
                               );
                           await ref
-                              .read(noteProvider.notifier)
-                              .save(currentNote);
+                              .read(documentProvider.notifier)
+                              .save(currentDocument);
 
-                          ref.read(currentNoteProvider.notifier).state = ref
-                              .read(noteProvider.notifier)
-                              .getDocumentWithUuid(currentNote.uuid);
+                          ref.read(currentDocumentProvider.notifier).state = ref
+                              .read(documentProvider.notifier)
+                              .getDocumentWithUuid(currentDocument.uuid);
                         } catch (error) {
                           // ignore: use_build_context_synchronously
                           ScaffoldMessenger.of(context).clearSnackBars();
@@ -196,9 +198,9 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
                     MenuItemButton(
                       onPressed: () async {
                         try {
-                          ref.read(currentNoteProvider.notifier).state =
+                          ref.read(currentDocumentProvider.notifier).state =
                               await ref
-                                  .read(noteProvider.notifier)
+                                  .read(documentProvider.notifier)
                                   .loadDocument();
                         } catch (error) {
                           // ignore: use_build_context_synchronously
@@ -235,11 +237,21 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
                     ),
                   ],
                 ),
+                const SizedBox(width: 5),
+                TextButton(
+                  onPressed: () {},
+                  style: TextButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  child: const Text("Settings"),
+                ),
               ],
             ),
           ),
           const Expanded(
-            child: NoteEditingPage(),
+            child: DocumentEditingPage(),
           ),
         ],
       ),
@@ -249,7 +261,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
   @override
   void onWindowClose() async {
     final documents = ref
-        .read(noteProvider.notifier)
+        .read(documentProvider.notifier)
         .getDocuments()
         .where((element) => element.isNotSaved);
 
@@ -281,7 +293,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
           actions: [
             TextButton(
               onPressed: () async {
-                await ref.read(noteProvider.notifier).save(document);
+                await ref.read(documentProvider.notifier).save(document);
                 // ignore: use_build_context_synchronously
                 Navigator.of(context).pop();
 
@@ -305,7 +317,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
             ),
             TextButton(
               onPressed: () async {
-                await ref.read(noteProvider.notifier).saveAll();
+                await ref.read(documentProvider.notifier).saveAll();
 
                 // Just close the window
                 super.onWindowClose();
@@ -321,7 +333,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
     }
 
     if (!dialogGotShown) {
-      await ref.read(noteProvider.notifier).saveAll();
+      await ref.read(documentProvider.notifier).saveAll();
       super.onWindowClose();
       exit(0);
     }

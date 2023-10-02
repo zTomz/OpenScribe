@@ -23,7 +23,7 @@ class DocumentTab extends ConsumerWidget {
       padding: const EdgeInsets.only(left: 10.0, top: 5),
       child: InkWell(
         onTap: () {
-          ref.read(currentNoteProvider.notifier).state = document;
+          ref.read(currentDocumentProvider.notifier).state = document;
         },
         hoverColor: MyColors.grey.withOpacity(0.1),
         borderRadius: const BorderRadius.vertical(
@@ -75,23 +75,25 @@ class DocumentTab extends ConsumerWidget {
                   }
 
                   if (document.isEmpty) {
-                    ref.read(noteProvider.notifier).remove(
+                    ref.read(documentProvider.notifier).remove(
                           document.uuid,
                         );
 
-                    if (ref.read(currentNoteProvider.notifier).state.uuid ==
+                    if (ref.read(currentDocumentProvider.notifier).state.uuid ==
                         document.uuid) {
-                      ref.read(currentNoteProvider.notifier).state =
-                          ref.read(noteProvider.notifier).getFirstDocument();
+                      ref.read(currentDocumentProvider.notifier).state = ref
+                          .read(documentProvider.notifier)
+                          .getFirstDocument();
                     }
                   } else {
-                    ref.read(noteProvider.notifier).save(document);
-                    ref.read(noteProvider.notifier).remove(document.uuid);
+                    ref.read(documentProvider.notifier).save(document);
+                    ref.read(documentProvider.notifier).remove(document.uuid);
 
-                    if (ref.read(currentNoteProvider.notifier).state.uuid ==
+                    if (ref.read(currentDocumentProvider.notifier).state.uuid ==
                         document.uuid) {
-                      ref.read(currentNoteProvider.notifier).state =
-                          ref.read(noteProvider.notifier).getFirstDocument();
+                      ref.read(currentDocumentProvider.notifier).state = ref
+                          .read(documentProvider.notifier)
+                          .getFirstDocument();
                     }
                   }
                 },

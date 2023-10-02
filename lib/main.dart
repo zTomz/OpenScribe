@@ -1,5 +1,5 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
-import 'package:openscribe/main_screen.dart';
+import 'package:openscribe/document_page_overlay_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -84,7 +84,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: theme,
           darkTheme: darkTheme,
-          home: const MainScreen(),
+          home: const DocumentPageOverlayScreen(),
         );
       },
     );

@@ -6,19 +6,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class NoteEditingPage extends HookConsumerWidget {
-  const NoteEditingPage({super.key});
+class DocumentEditingPage extends HookConsumerWidget {
+  const DocumentEditingPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    Document note = ref.watch(currentNoteProvider);
+    Document document = ref.watch(currentDocumentProvider);
 
     final titleController = useTextEditingController();
-    final noteController = useTextEditingController();
+    final textController = useTextEditingController();
 
-    titleController.text = (note.title ?? "Unknown")
+    titleController.text = (document.title ?? "Unknown")
         .replaceAll(
           ".edoc",
           "",
@@ -27,18 +27,18 @@ class NoteEditingPage extends HookConsumerWidget {
           ".txt",
           "",
         );
-    noteController.text = note.text;
+    textController.text = document.text;
 
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyS):
             () async {
           try {
-            ref.read(noteProvider.notifier).changeText(
-                  noteController.text,
-                  note.uuid,
+            ref.read(documentProvider.notifier).changeText(
+                  textController.text,
+                  document.uuid,
                 );
-            await ref.read(noteProvider.notifier).save(note);
+            await ref.read(documentProvider.notifier).save(document);
           } catch (error) {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).clearSnackBars();
@@ -54,15 +54,15 @@ class NoteEditingPage extends HookConsumerWidget {
           }
         },
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyN): () {
-          // Create a new document and asign it to currentNoteProvider
-          ref.read(currentNoteProvider.notifier).state =
-              ref.read(noteProvider.notifier).createNew();
+          // Create a new document and asign it to currentDocumentProvider
+          ref.read(currentDocumentProvider.notifier).state =
+              ref.read(documentProvider.notifier).createNew();
         },
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyL):
             () async {
           try {
-            ref.read(currentNoteProvider.notifier).state =
-                await ref.read(noteProvider.notifier).loadDocument();
+            ref.read(currentDocumentProvider.notifier).state =
+                await ref.read(documentProvider.notifier).loadDocument();
           } catch (error) {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).clearSnackBars();
@@ -97,14 +97,14 @@ class NoteEditingPage extends HookConsumerWidget {
                     onChanged: (value) {
                       try {
                         ref
-                            .read(noteProvider.notifier)
-                            .changeTitle(value, note.uuid);
+                            .read(documentProvider.notifier)
+                            .changeTitle(value, document.uuid);
 
-                        // Else it will reset the content of note to empty, but in production it works (where no hot reload takes place)
+                        // Else it will reset the content of document to empty, but in production it works (where no hot reload takes place)
                         if (kDebugMode) {
-                          ref.read(currentNoteProvider.notifier).state = ref
-                              .read(noteProvider.notifier)
-                              .getDocumentWithUuid(note.uuid);
+                          ref.read(currentDocumentProvider.notifier).state = ref
+                              .read(documentProvider.notifier)
+                              .getDocumentWithUuid(document.uuid);
                         }
                       } catch (error) {
                         ScaffoldMessenger.of(context).clearSnackBars();
@@ -126,11 +126,11 @@ class NoteEditingPage extends HookConsumerWidget {
                 Expanded(
                   child: TextField(
                     maxLines: null,
-                    controller: noteController,
+                    controller: textController,
                     onChanged: (value) {
-                      ref.read(currentNoteProvider.notifier).state =
-                          note.copyWith(
-                        text: noteController.text,
+                      ref.read(currentDocumentProvider.notifier).state =
+                          document.copyWith(
+                        text: textController.text,
                       );
                     },
                     decoration: const InputDecoration(

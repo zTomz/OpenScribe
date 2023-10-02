@@ -11,10 +11,10 @@ class MyColors {
   static const Color red = Color(0xFFF9544E);
 }
 
-final noteProvider = StateNotifierProvider<DocumentNotifier, List<Document>>(
+final documentProvider = StateNotifierProvider<DocumentNotifier, List<Document>>(
   (ref) => DocumentNotifier(),
 );
 
-final currentNoteProvider = StateProvider<Document>(
-  (ref) => ref.read(noteProvider.notifier).getFirstDocument(),
+final currentDocumentProvider = StateProvider<Document>(
+  (ref) => ref.read(documentProvider.notifier).getFirstDocument(),
 );
