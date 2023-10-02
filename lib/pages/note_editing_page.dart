@@ -17,7 +17,7 @@ class NoteEditingPage extends HookConsumerWidget {
     final titleController = useTextEditingController();
     final noteController = useTextEditingController();
 
-    titleController.text = note.title
+    titleController.text = (note.title ?? "Unknown")
         .replaceAll(
           ".edoc",
           "",
@@ -28,6 +28,8 @@ class NoteEditingPage extends HookConsumerWidget {
         );
     noteController.text = note.text;
 
+    print(note);
+
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyS):
@@ -37,7 +39,7 @@ class NoteEditingPage extends HookConsumerWidget {
                   noteController.text,
                   note.uuid,
                 );
-            await ref.read(noteProvider.notifier).save(note.uuid);
+            await ref.read(noteProvider.notifier).save(note);
           } catch (error) {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).clearSnackBars();
@@ -124,9 +126,7 @@ class NoteEditingPage extends HookConsumerWidget {
                                   noteController.text,
                                   note.uuid,
                                 );
-                            await ref.read(noteProvider.notifier).save(
-                                  note.uuid,
-                                );
+                            await ref.read(noteProvider.notifier).save(note);
                           } catch (error) {
                             // ignore: use_build_context_synchronously
                             ScaffoldMessenger.of(context).clearSnackBars();

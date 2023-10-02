@@ -7,9 +7,9 @@ import 'package:uuid/uuid.dart';
 
 @immutable
 class Document {
-  final String title;
+  final String? title;
   final String text;
-  final String diskLocation;
+  final String? diskLocation;
   final String uuid;
 
   const Document({
@@ -21,9 +21,9 @@ class Document {
 
   static Document empty() {
     return Document(
-      title: "Unknown",
+      title: null,
       text: "",
-      diskLocation: "",
+      diskLocation: null,
       uuid: const Uuid().v4(),
     );
   }
@@ -46,7 +46,11 @@ class Document {
     return 'Document(title: $title, text: $text, diskLocation: $diskLocation, uuid: $uuid)';
   }
 
-  bool get isEmpty => title == "Unknown" && text.isEmpty && diskLocation.isEmpty;
+  bool get isEmpty =>
+      title == "Unknown" && text.isEmpty && diskLocation == null;
+  bool get isNotEmpty => !isEmpty;
+  bool get isNotSaved => title != null && diskLocation == null;
+  bool get isSaved => diskLocation != null;
 }
 
 class DocumentNotifier extends StateNotifier<List<Document>> {
@@ -85,8 +89,8 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
   void changeTitle(String newTitle, String uuid) {
     Document doc = state.firstWhere((doc) => doc.uuid == uuid);
 
-    if (doc.diskLocation.isNotEmpty) {
-      List<String> newPathList = doc.diskLocation.split("\\");
+    if (doc.diskLocation != null) {
+      List<String> newPathList = doc.diskLocation!.split("\\");
       newPathList.removeLast();
       String newPath = newPathList.join("\\");
 
@@ -97,7 +101,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
         throw "File with same title already exists.";
       }
 
-      File(doc.diskLocation).renameSync("$newPath\\$newTitle.edoc");
+      File(doc.diskLocation!).renameSync("$newPath\\$newTitle.edoc");
 
       doc = doc.copyWith(
         title: newTitle,
@@ -127,14 +131,13 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     ];
   }
 
-  Future<void> save(String uuid) async {
-    Document doc = state.firstWhere((doc) => doc.uuid == uuid);
-    String diskLocation = doc.diskLocation;
+  Future<void> save(Document doc) async {
+    String? diskLocation = doc.diskLocation;
 
-    if (diskLocation.isEmpty) {
+    if (diskLocation == null) {
       final result = await FilePicker.platform.saveFile(
         dialogTitle: "Save file",
-        fileName: "${doc.title}.edoc",
+        fileName: "${doc.title ?? "Unknown"}.edoc",
         type: FileType.custom,
         allowedExtensions: ["edoc", "txt"],
       );
@@ -144,6 +147,11 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
       } else {
         throw ("User cancelled the picker.",);
       }
+    }
+
+    // ignore: unnecessary_null_comparison
+    if (diskLocation == null) {
+      return;
     }
 
     final file = File(diskLocation);
@@ -157,14 +165,17 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     // Update the state, remove the old document and add the updatet one
     state = [
       for (final document in state)
-        if (document.uuid != uuid) document,
+        if (document.uuid != doc.uuid) document,
       doc.copyWith(diskLocation: diskLocation)
     ];
   }
 
+  /// Saves only every already saved document. Unsaved documents are ignored.
   Future<void> saveAll() async {
     for (final document in state) {
-      await save(document.uuid);
+      if (document.isSaved) {
+        await save(document);
+      }
     }
   }
 
@@ -175,11 +186,23 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     ];
   }
 
+  void removeMultiple(List<String> uuids) {
+    state = [
+      for (final uuid in uuids)
+        for (final document in state)
+          if (document.uuid != uuid) document,
+    ];
+  }
+
   Document getFirstDocument() {
     return state.first;
   }
 
   Document getDocumentWithUuid(String uuid) {
     return state.firstWhere((doc) => doc.uuid == uuid);
+  }
+
+  List<Document> getDocuments() {
+    return state;
   }
 }

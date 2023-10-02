@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
@@ -102,7 +103,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    documents[index].title,
+                                    documents[index].title ?? "Unknown",
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
@@ -174,9 +175,83 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
   }
 
   @override
-  void onWindowClose() {
-    ref.read(noteProvider.notifier).saveAll();
+  void onWindowClose() async {
+    final documents = ref
+        .read(noteProvider.notifier)
+        .getDocuments()
+        .where((element) => element.isNotSaved);
 
-    super.onWindowClose();
+    bool dialogGotShown = false;
+    int index = 0;
+
+    for (final document in documents) {
+      dialogGotShown = true;
+
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Warning"),
+          content: RichText(
+            text: TextSpan(
+              children: [
+                const TextSpan(text: "The docuement "),
+                TextSpan(
+                  text: document.title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const TextSpan(text: " is not saved.")
+              ],
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await ref.read(noteProvider.notifier).save(document);
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pop();
+
+                if (index == documents.length - 1) {
+                  super.onWindowClose();
+                  exit(0);
+                }
+              },
+              child: const Text("Save"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+
+                if (index == documents.length - 1) {
+                  super.onWindowClose();
+                  exit(0);
+                }
+              },
+              child: const Text("Don't save"),
+            ),
+            TextButton(
+              onPressed: () async {
+                await ref.read(noteProvider.notifier).saveAll();
+
+                // Just close the window
+                super.onWindowClose();
+                exit(0);
+              },
+              child: const Text("Quit"),
+            ),
+          ],
+        ),
+      );
+
+      index += 1;
+    }
+
+    if (!dialogGotShown) {
+      await ref.read(noteProvider.notifier).saveAll();
+      super.onWindowClose();
+      exit(0);
+    }
   }
 }

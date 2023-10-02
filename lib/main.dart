@@ -27,6 +27,7 @@ void main() async {
     await windowManager.setHasShadow(false);
     await windowManager.show();
     await windowManager.focus();
+    await windowManager.setPreventClose(true);
   });
 
   runApp(const ProviderScope(child: MyApp()));
@@ -57,7 +58,7 @@ class MyApp extends StatelessWidget {
           ),
         );
       },
-      title: 'openscribe',
+      title: 'Open Scribe',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
