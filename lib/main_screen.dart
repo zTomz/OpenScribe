@@ -2,19 +2,17 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:openscribe/constants.dart';
 import 'package:openscribe/models/document.dart';
 import 'package:openscribe/pages/note_editing_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:openscribe/widgets/documents_tab.dart';
 import 'package:window_manager/window_manager.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
-  final Widget child;
-  const MainScreen({
-    super.key,
-    required this.child,
-  });
+  const MainScreen({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _MainScreenState();
@@ -57,6 +55,12 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
             height: 40,
             child: Row(
               children: [
+                const SizedBox(width: 10),
+                SizedBox(
+                  width: 25,
+                  height: 25,
+                  child: Image.asset("assets/icons/app_icon.ico"),
+                ),
                 SizedBox(
                   width: min(
                     windowSize.width * 0.7,
@@ -76,89 +80,10 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
                     child: ListView.builder(
                       itemCount: documents.length,
                       scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) => Padding(
-                        padding: const EdgeInsets.only(left: 10.0, top: 5),
-                        child: InkWell(
-                          onTap: () {
-                            ref.read(currentNoteProvider.notifier).state =
-                                documents[index];
-                          },
-                          hoverColor: MyColors.grey.withOpacity(0.1),
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(15),
-                          ),
-                          child: Container(
-                            height: 35,
-                            width: tabSize,
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 10.0),
-                            decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(15),
-                              ),
-                              border: Border.all(
-                                width: 2,
-                                color: colorScheme.primary,
-                              ),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    documents[index].title ?? "Unknown",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    // Remove document
-                                    if (documents.length <= 1) {
-                                      return;
-                                    }
-
-                                    final document = documents[index];
-
-                                    if (document.isEmpty) {
-                                      ref.read(noteProvider.notifier).remove(
-                                            document.uuid,
-                                          );
-
-                                      if (ref
-                                              .read(
-                                                  currentNoteProvider.notifier)
-                                              .state
-                                              .uuid ==
-                                          document.uuid) {
-                                        ref
-                                                .read(currentNoteProvider.notifier)
-                                                .state =
-                                            ref
-                                                .read(noteProvider.notifier)
-                                                .getFirstDocument();
-                                      }
-                                    }
-                                  },
-                                  // TODO: Add a confirmation dialog
-                                  onLongPress: () =>
-                                      ref.read(noteProvider.notifier).remove(
-                                            documents[index].uuid,
-                                          ),
-                                  hoverColor: MyColors.grey.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(180),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4),
-                                    child: Icon(
-                                      Icons.close_rounded,
-                                      color: colorScheme.primary,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                      itemBuilder: (context, index) => DocumentTab(
+                        document: documents[index],
+                        documents: documents,
+                        tabSize: tabSize,
                       ),
                     ),
                   ),
@@ -168,6 +93,147 @@ class _MainScreenState extends ConsumerState<MainScreen> with WindowListener {
                     backgroundColor: colorScheme.background,
                     brightness: colorScheme.brightness,
                   ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            height: 20,
+            margin: const EdgeInsets.only(left: 5, top: 5),
+            child: Row(
+              children: [
+                MenuAnchor(
+                  builder: (context, controller, child) => TextButton(
+                    onPressed: () {
+                      if (controller.isOpen) {
+                        controller.close();
+                      } else {
+                        controller.open();
+                      }
+                    },
+                    style: TextButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    child: const Text("File"),
+                  ),
+                  menuChildren: [
+                    MenuItemButton(
+                      onPressed: () {
+                        ref.read(currentNoteProvider.notifier).state =
+                            ref.read(noteProvider.notifier).createNew();
+                      },
+                      child: Row(
+                        children: [
+                          SvgPicture.asset(
+                            "assets/icons/document.svg",
+                            color: colorScheme.primary,
+                            width: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            "New Document",
+                            style: TextStyle(
+                              color: colorScheme.primary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    MenuItemButton(
+                      onPressed: () async {
+                        try {
+                          final currentNote =
+                              ref.read(currentNoteProvider.notifier).state;
+
+                          ref.read(noteProvider.notifier).changeText(
+                                currentNote.text,
+                                currentNote.uuid,
+                              );
+                          await ref
+                              .read(noteProvider.notifier)
+                              .save(currentNote);
+
+                          ref.read(currentNoteProvider.notifier).state = ref
+                              .read(noteProvider.notifier)
+                              .getDocumentWithUuid(currentNote.uuid);
+                        } catch (error) {
+                          // ignore: use_build_context_synchronously
+                          ScaffoldMessenger.of(context).clearSnackBars();
+                          // ignore: use_build_context_synchronously
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              behavior: SnackBarBehavior.floating,
+                              content: Text(
+                                error.toString(),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          SvgPicture.asset(
+                            "assets/icons/disk.svg",
+                            color: colorScheme.primary,
+                            width: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            "Save Document",
+                            style: TextStyle(
+                              color: colorScheme.primary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    MenuItemButton(
+                      onPressed: () async {
+                        try {
+                          ref.read(currentNoteProvider.notifier).state =
+                              await ref
+                                  .read(noteProvider.notifier)
+                                  .loadDocument();
+                        } catch (error) {
+                          // ignore: use_build_context_synchronously
+                          ScaffoldMessenger.of(context).clearSnackBars();
+                          // ignore: use_build_context_synchronously
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              behavior: SnackBarBehavior.floating,
+                              content: Text(
+                                error as String,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          SvgPicture.asset(
+                            "assets/icons/folder.svg",
+                            color: colorScheme.primary,
+                            width: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            "Load Document",
+                            style: TextStyle(
+                              color: colorScheme.primary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

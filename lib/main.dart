@@ -2,7 +2,6 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:openscribe/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
-import 'package:openscribe/pages/note_editing_page.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -85,9 +84,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: theme,
           darkTheme: darkTheme,
-          home: const MainScreen(
-            child: NoteEditingPage(),
-          ),
+          home: const MainScreen(),
         );
       },
     );

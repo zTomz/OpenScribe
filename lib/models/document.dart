@@ -46,8 +46,7 @@ class Document {
     return 'Document(title: $title, text: $text, diskLocation: $diskLocation, uuid: $uuid)';
   }
 
-  bool get isEmpty =>
-      title == "Unknown" && text.isEmpty && diskLocation == null;
+  bool get isEmpty => title == null && text.isEmpty && diskLocation == null;
   bool get isNotEmpty => !isEmpty;
   bool get isNotSaved => title != null && diskLocation == null;
   bool get isSaved => diskLocation != null;
@@ -56,11 +55,19 @@ class Document {
 class DocumentNotifier extends StateNotifier<List<Document>> {
   DocumentNotifier() : super([Document.empty()]);
 
-  void createNew() {
-    state = [...state, Document.empty()];
+  /// Newly created document gets returned
+  Document createNew() {
+    final newDoc = Document.empty();
+
+    state = [
+      ...state,
+      newDoc,
+    ];
+
+    return newDoc;
   }
 
-  Future loadDocument() async {
+  Future<Document> loadDocument() async {
     final result = await FilePicker.platform.pickFiles(
       dialogTitle: "Load file",
       type: FileType.custom,
@@ -84,6 +91,8 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
       ...state,
       newDoc,
     ];
+
+    return newDoc;
   }
 
   void changeTitle(String newTitle, String uuid) {

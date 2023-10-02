@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class NoteEditingPage extends HookConsumerWidget {
@@ -53,6 +52,30 @@ class NoteEditingPage extends HookConsumerWidget {
               ),
             );
           }
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyN): () {
+          // Create a new document and asign it to currentNoteProvider
+          ref.read(currentNoteProvider.notifier).state =
+              ref.read(noteProvider.notifier).createNew();
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyL):
+            () async {
+          try {
+            ref.read(currentNoteProvider.notifier).state =
+                await ref.read(noteProvider.notifier).loadDocument();
+          } catch (error) {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).clearSnackBars();
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  error.toString(),
+                ),
+              ),
+            );
+          }
         }
       },
       child: Focus(
@@ -64,114 +87,40 @@ class NoteEditingPage extends HookConsumerWidget {
             child: Column(
               children: [
                 SizedBox(
-                  height: 40,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: titleController,
-                          style: const TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          onChanged: (value) {
-                            try {
-                              ref
-                                  .read(noteProvider.notifier)
-                                  .changeTitle(value, note.uuid);
+                  height: 35,
+                  child: TextField(
+                    controller: titleController,
+                    style: const TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    onChanged: (value) {
+                      try {
+                        ref
+                            .read(noteProvider.notifier)
+                            .changeTitle(value, note.uuid);
 
-                              // Else it will reset the content of note to empty, but in production it works (where no hot reload takes place)
-                              if (kDebugMode) {
-                                ref.read(currentNoteProvider.notifier).state =
-                                    ref
-                                        .read(noteProvider.notifier)
-                                        .getDocumentWithUuid(note.uuid);
-                              }
-                            } catch (error) {
-                              ScaffoldMessenger.of(context).clearSnackBars();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  behavior: SnackBarBehavior.floating,
-                                  content: Text(
-                                    error.toString(),
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
+                        // Else it will reset the content of note to empty, but in production it works (where no hot reload takes place)
+                        if (kDebugMode) {
+                          ref.read(currentNoteProvider.notifier).state = ref
+                              .read(noteProvider.notifier)
+                              .getDocumentWithUuid(note.uuid);
+                        }
+                      } catch (error) {
+                        ScaffoldMessenger.of(context).clearSnackBars();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            behavior: SnackBarBehavior.floating,
+                            content: Text(
+                              error.toString(),
+                            ),
                           ),
-                        ),
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () async {
-                          ref.read(noteProvider.notifier).createNew();
-                        },
-                        icon: SvgPicture.asset(
-                          "assets/icons/document.svg",
-                          color: colorScheme.onBackground,
-                        ),
-                        tooltip: "New file",
-                      ),
-                      const SizedBox(width: 10),
-                      IconButton(
-                        onPressed: () async {
-                          try {
-                            ref.read(noteProvider.notifier).changeText(
-                                  noteController.text,
-                                  note.uuid,
-                                );
-                            await ref.read(noteProvider.notifier).save(note);
-                          } catch (error) {
-                            // ignore: use_build_context_synchronously
-                            ScaffoldMessenger.of(context).clearSnackBars();
-                            // ignore: use_build_context_synchronously
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                behavior: SnackBarBehavior.floating,
-                                content: Text(
-                                  error.toString(),
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                        icon: SvgPicture.asset(
-                          "assets/icons/disk.svg",
-                          color: colorScheme.onBackground,
-                        ),
-                        tooltip: "Save",
-                      ),
-                      const SizedBox(width: 10),
-                      IconButton(
-                        onPressed: () async {
-                          try {
-                            await ref
-                                .read(noteProvider.notifier)
-                                .loadDocument();
-                          } catch (error) {
-                            // ignore: use_build_context_synchronously
-                            ScaffoldMessenger.of(context).clearSnackBars();
-                            // ignore: use_build_context_synchronously
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                behavior: SnackBarBehavior.floating,
-                                content: Text(
-                                  error.toString(),
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                        icon: SvgPicture.asset(
-                          "assets/icons/folder.svg",
-                          color: colorScheme.onBackground,
-                        ),
-                        tooltip: "Open",
-                      ),
-                    ],
+                        );
+                      }
+                    },
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                    ),
                   ),
                 ),
                 Expanded(
@@ -179,10 +128,10 @@ class NoteEditingPage extends HookConsumerWidget {
                     maxLines: null,
                     controller: noteController,
                     onChanged: (value) {
-                      ref.read(noteProvider.notifier).changeText(
-                            value,
-                            note.uuid,
-                          );
+                      ref.read(currentNoteProvider.notifier).state =
+                          note.copyWith(
+                        text: noteController.text,
+                      );
                     },
                     decoration: const InputDecoration(
                       border: InputBorder.none,
