@@ -135,7 +135,7 @@ class SettingsPage extends HookConsumerWidget {
     // Save primary color to shared preferences
     final sharedPreferences = await SharedPreferences.getInstance();
     final result = await sharedPreferences.setString(
-      "primaryAppColor",
+      MemoryLocations.primaryAppColor,
       primaryColor.value.toString(),
     );
     debugPrint(result.toString());

@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:openscribe/constants.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 @immutable
@@ -95,6 +98,46 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     return newDoc;
   }
 
+  Future<Document> loadDocumentFromCache(String uuid,
+      {bool removeOldDocument = false}) async {
+    final applicationDocumentsDirectory =
+        await getApplicationDocumentsDirectory();
+    final path =
+        "${applicationDocumentsDirectory.path}\\${MemoryLocations.documentsCacheLocation}\\$uuid.json";
+
+    final file = File(path);
+
+    if (!(await file.exists())) {
+      throw "File does not exist.";
+    }
+
+    if (path.split(".").last != "json") {
+      throw "File is not a json file.";
+    }
+
+    final Map<String, dynamic> data = jsonDecode(await file.readAsString());
+    print("Data: $data");
+
+    if (removeOldDocument) {
+      await file.delete();
+    }
+
+    Document newDoc = Document(
+      title: data["title"] == "Unknown" ? null : data["title"],
+      text: data["text"],
+      diskLocation:
+          data["diskLocation"] == "null" ? null : data["diskLocation"],
+      uuid: uuid,
+    );
+
+    state = [
+      ...state,
+      newDoc,
+    ];
+
+    return newDoc;
+  }
+
   void changeTitle(String newTitle, String uuid) {
     Document doc = state.firstWhere((doc) => doc.uuid == uuid);
 
@@ -173,9 +216,9 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
 
     // Update the state, remove the old document and add the updatet one
     state = [
+      doc.copyWith(diskLocation: diskLocation),
       for (final document in state)
         if (document.uuid != doc.uuid) document,
-      doc.copyWith(diskLocation: diskLocation)
     ];
   }
 
@@ -186,6 +229,29 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
         await save(document);
       }
     }
+  }
+
+  Future<void> saveToDocumentsCache(Document document) async {
+    final applicationDocumentsDirectory =
+        await getApplicationDocumentsDirectory();
+    final path =
+        "${applicationDocumentsDirectory.path}\\${MemoryLocations.documentsCacheLocation}\\${document.uuid}.json"; // Important: JSON Document, not .edoc, the name of doc is the uuid and the title + text is stored in the document
+    final file = File(path);
+
+    // Almost impossible, but just in case
+    if (file.existsSync()) {
+      return;
+    }
+
+    final dataToWrite = {
+      "\"title\"": "\"${document.title ?? "Unknown"}\"",
+      "\"text\"": "\"${document.text}\"",
+      "\"diskLocation\"":
+          '"${(document.diskLocation ?? "null").replaceAll("\\", "\\\\")}"',
+    };
+
+    file.createSync(recursive: true);
+    file.writeAsStringSync(dataToWrite.toString());
   }
 
   void remove(String uuid) {
@@ -203,6 +269,16 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     ];
   }
 
+  Future<void> deleteCachedDocuments() async {
+    final applicationDocumentsDirectory =
+        await getApplicationDocumentsDirectory();
+    Directory cacheDocumentsDirectory = Directory(
+      "${applicationDocumentsDirectory.path}\\${MemoryLocations.documentsCacheLocation}",
+    );
+
+    await cacheDocumentsDirectory.delete(recursive: true);
+  }
+
   Document getFirstDocument() {
     return state.first;
   }
@@ -213,5 +289,9 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
 
   List<Document> getDocuments() {
     return state;
+  }
+
+  void clear() {
+    state = [];
   }
 }

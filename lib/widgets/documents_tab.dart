@@ -86,8 +86,51 @@ class DocumentTab extends ConsumerWidget {
                           .getFirstDocument();
                     }
                   } else {
-                    ref.read(documentProvider.notifier).save(document);
-                    ref.read(documentProvider.notifier).remove(document.uuid);
+                    // Show dialog if user want to save or delete document
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text(
+                          "Are you sure?",
+                        ),
+                        content: const Text(
+                          "Do you want to delete this document?",
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text(
+                              "Cancel",
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              ref.read(documentProvider.notifier).remove(
+                                    document.uuid,
+                                  );
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text(
+                              "Delete",
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              ref.read(documentProvider.notifier).save(
+                                    document,
+                                  );
+
+                              Navigator.pop(context);
+                            },
+                            child: const Text(
+                              "Save",
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
 
                     if (ref.read(currentDocumentProvider.notifier).state.uuid ==
                         document.uuid) {

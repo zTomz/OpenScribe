@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openscribe/pages/settings_page.dart';
 import 'package:openscribe/widgets/documents_tab.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
 class DocumentPageOverlayScreen extends ConsumerStatefulWidget {
@@ -267,82 +268,108 @@ class _DocumentPageOverlayScreenState
 
   @override
   void onWindowClose() async {
-    final documents = ref
-        .read(documentProvider.notifier)
-        .getDocuments()
-        .where((element) => element.isNotSaved);
+    // Clear shared preferences
+    final instance = await SharedPreferences.getInstance();
+    await instance.setStringList(
+      MemoryLocations.documentsFromOlderSessions,
+      [],
+    );
 
-    bool dialogGotShown = false;
-    int index = 0;
+    // Save not saved documents
+    final documents = ref.read(documentProvider.notifier).getDocuments().where(
+          (element) => element.isNotEmpty,
+        );
 
-    for (final document in documents) {
-      dialogGotShown = true;
-
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Warning"),
-          content: RichText(
-            text: TextSpan(
-              children: [
-                const TextSpan(text: "The docuement "),
-                TextSpan(
-                  text: document.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const TextSpan(text: " is not saved.")
-              ],
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                await ref.read(documentProvider.notifier).save(document);
-                // ignore: use_build_context_synchronously
-                Navigator.of(context).pop();
-
-                if (index == documents.length - 1) {
-                  super.onWindowClose();
-                  exit(0);
-                }
-              },
-              child: const Text("Save"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-
-                if (index == documents.length - 1) {
-                  super.onWindowClose();
-                  exit(0);
-                }
-              },
-              child: const Text("Don't save"),
-            ),
-            TextButton(
-              onPressed: () async {
-                await ref.read(documentProvider.notifier).saveAll();
-
-                // Just close the window
-                super.onWindowClose();
-                exit(0);
-              },
-              child: const Text("Quit"),
-            ),
-          ],
-        ),
-      );
-
-      index += 1;
+    for (final Document document in documents) {
+      await ref.read(documentProvider.notifier).saveToDocumentsCache(document);
     }
 
-    if (!dialogGotShown) {
-      await ref.read(documentProvider.notifier).saveAll();
-      super.onWindowClose();
-      exit(0);
-    }
+    final result = await instance.setStringList(
+      MemoryLocations.documentsFromOlderSessions,
+      documents.map((e) => e.uuid).toList(),
+    );
+
+    debugPrint(
+        "Saved documents to cache: $result - ${documents.map((e) => e.uuid).toList()}");
+
+    // Save all saved documents
+    await ref.read(documentProvider.notifier).saveAll();
+
+    // Exit
+    super.onWindowClose();
+    exit(0);
+
+    // bool dialogGotShown = false;
+    // int index = 0;
+
+    // for (final document in documents) {
+    //   dialogGotShown = true;
+
+    //   await showDialog(
+    //     context: context,
+    //     builder: (context) => AlertDialog(
+    //       title: const Text("Warning"),
+    //       content: RichText(
+    //         text: TextSpan(
+    //           children: [
+    //             const TextSpan(text: "The docuement "),
+    //             TextSpan(
+    //               text: document.title,
+    //               style: const TextStyle(
+    //                 fontWeight: FontWeight.bold,
+    //               ),
+    //             ),
+    //             const TextSpan(text: " is not saved.")
+    //           ],
+    //           style: Theme.of(context).textTheme.bodyMedium,
+    //         ),
+    //       ),
+    //       actions: [
+    //         TextButton(
+    //           onPressed: () async {
+    //             await ref.read(documentProvider.notifier).save(document);
+    //             // ignore: use_build_context_synchronously
+    //             Navigator.of(context).pop();
+
+    //             if (index == documents.length - 1) {
+    //               super.onWindowClose();
+    //               exit(0);
+    //             }
+    //           },
+    //           child: const Text("Save"),
+    //         ),
+    //         TextButton(
+    //           onPressed: () {
+    //             Navigator.of(context).pop();
+
+    //             if (index == documents.length - 1) {
+    //               super.onWindowClose();
+    //               exit(0);
+    //             }
+    //           },
+    //           child: const Text("Don't save"),
+    //         ),
+    //         TextButton(
+    //           onPressed: () async {
+    //             await ref.read(documentProvider.notifier).saveAll();
+
+    //             // Just close the window
+    //             super.onWindowClose();
+    //             exit(0);
+    //           },
+    //           child: const Text("Quit"),
+    //         ),
+    //       ],
+    //     ),
+    //   );
+
+    //   index += 1;
+    // }
+
+    // if (!dialogGotShown) {
+    //   await ref.read(documentProvider.notifier).saveAll();
+    //   super.onWindowClose();
+    //   exit(0);
+    // }
   }
 }

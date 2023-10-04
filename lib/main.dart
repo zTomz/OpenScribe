@@ -1,4 +1,5 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:openscribe/constants.dart';
 import 'package:openscribe/document_page_overlay_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
@@ -33,7 +34,7 @@ void main() async {
 
   AdaptiveThemeMode? savedThemeMode = await AdaptiveTheme.getThemeMode();
 
-  final primaryColor = await loadPrimaryColor();
+  final Color? primaryColor = await loadPrimaryColor();
 
   runApp(
     ProviderScope(
@@ -45,7 +46,7 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerStatefulWidget {
   final AdaptiveThemeMode? savedThemeMode;
   final Color? primaryColor;
 
@@ -55,6 +56,18 @@ class MyApp extends StatelessWidget {
     this.primaryColor,
   });
 
+  @override
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  @override
+  void initState() {
+    loadOlderSessions();
+
+    super.initState();
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -62,17 +75,17 @@ class MyApp extends StatelessWidget {
       light: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.light(
-          primary: primaryColor ?? Colors.orange,
+          primary: widget.primaryColor ?? Colors.orange,
         ),
       ),
       dark: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.dark(
-          primary: primaryColor ?? Colors.orange,
+          primary: widget.primaryColor ?? Colors.orange,
         ),
       ),
       // debugShowFloatingThemeButton: true,
-      initial: savedThemeMode ?? AdaptiveThemeMode.system,
+      initial: widget.savedThemeMode ?? AdaptiveThemeMode.system,
       builder: (theme, darkTheme) {
         return MaterialApp(
           builder: (context, child) {
@@ -102,11 +115,62 @@ class MyApp extends StatelessWidget {
       },
     );
   }
+
+  Future<void> loadOlderSessions() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    final documentsUuids = sharedPreferences.getStringList(
+      MemoryLocations.documentsFromOlderSessions,
+    );
+
+    debugPrint("Old uuid's of documents: $documentsUuids");
+
+    // No saved documents from older sessions
+    if (documentsUuids == null || documentsUuids.isEmpty) {
+      return;
+    }
+
+    ref.read(documentProvider.notifier).clear();
+
+    for (final uuid in documentsUuids) {
+      try {
+        await ref.read(documentProvider.notifier).loadDocumentFromCache(
+              uuid,
+              removeOldDocument: true,
+            );
+      } catch (error) {
+        debugPrint("Error loading document:\n$error");
+
+        ref.read(documentProvider.notifier).deleteCachedDocuments();
+
+        final instance = await SharedPreferences.getInstance();
+        await instance.setStringList(
+          MemoryLocations.documentsFromOlderSessions,
+          [],
+        );
+
+        ref.read(documentProvider.notifier).createNew();
+        return;
+      }
+    }
+
+    // Clear shared preferences
+    final instance = await SharedPreferences.getInstance();
+    await instance.setStringList(
+      MemoryLocations.documentsFromOlderSessions,
+      [],
+    );
+
+    // Set current document to first document
+    ref.read(currentDocumentProvider.notifier).state =
+        ref.read(documentProvider.notifier).getFirstDocument();
+  }
 }
 
 Future<Color?> loadPrimaryColor() async {
   final sharedPreferences = await SharedPreferences.getInstance();
-  final primaryColor = sharedPreferences.getString("primaryAppColor");
+  final primaryColor = sharedPreferences.getString(
+    MemoryLocations.primaryAppColor,
+  );
 
   if (primaryColor == null) {
     return null;

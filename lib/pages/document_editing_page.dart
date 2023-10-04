@@ -128,6 +128,10 @@ class DocumentEditingPage extends HookConsumerWidget {
                           document.copyWith(
                         text: textController.text,
                       );
+                      ref.read(documentProvider.notifier).changeText(
+                            textController.text,
+                            document.uuid,
+                          );
                     },
                     decoration: const InputDecoration(
                       border: InputBorder.none,
