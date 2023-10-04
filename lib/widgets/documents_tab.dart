@@ -25,7 +25,7 @@ class DocumentTab extends ConsumerWidget {
         onTap: () {
           ref.read(currentDocumentProvider.notifier).state = document;
         },
-        hoverColor: MyColors.grey.withOpacity(0.1),
+        hoverColor: Colors.grey.withOpacity(0.075),
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(15),
         ),
@@ -97,7 +97,7 @@ class DocumentTab extends ConsumerWidget {
                     }
                   }
                 },
-                hoverColor: MyColors.grey.withOpacity(0.3),
+                hoverColor: Colors.grey.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(180),
                 child: Padding(
                   padding: const EdgeInsets.all(4),

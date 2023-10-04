@@ -8,6 +8,7 @@ import 'package:openscribe/models/document.dart';
 import 'package:openscribe/pages/document_editing_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:openscribe/pages/settings_page.dart';
 import 'package:openscribe/widgets/documents_tab.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -54,7 +55,7 @@ class _DocumentPageOverlayScreenState
       body: Column(
         children: [
           SizedBox(
-            height: 40,
+            height: windowTitleBarHeight,
             child: Row(
               children: [
                 const SizedBox(width: 10),
@@ -239,7 +240,13 @@ class _DocumentPageOverlayScreenState
                 ),
                 const SizedBox(width: 5),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const SettingsPage(),
+                      ),
+                    );
+                  },
                   style: TextButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6),
