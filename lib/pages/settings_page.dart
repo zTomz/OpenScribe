@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openscribe/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
 class SettingsPage extends HookConsumerWidget {
@@ -20,7 +21,7 @@ class SettingsPage extends HookConsumerWidget {
       body: Column(
         children: [
           SettingsWindowBar(
-            onClose: () {
+            onClose: () async {
               changePrimaryColor(context, primaryColor.value);
             },
           ),
@@ -107,7 +108,6 @@ class SettingsPage extends HookConsumerWidget {
                       hueBorderRadius: BorderRadius.circular(20),
                       paletteBorderRadius: BorderRadius.circular(20),
                     ),
-                    
                 ],
               ),
             ),
@@ -117,7 +117,8 @@ class SettingsPage extends HookConsumerWidget {
     );
   }
 
-  void changePrimaryColor(BuildContext context, Color primaryColor) {
+  Future<void> changePrimaryColor(
+      BuildContext context, Color primaryColor) async {
     AdaptiveTheme.of(context).setTheme(
       light: AdaptiveTheme.of(context).lightTheme.copyWith(
             colorScheme: ColorScheme.light(
@@ -130,6 +131,14 @@ class SettingsPage extends HookConsumerWidget {
             ),
           ),
     );
+
+    // Save primary color to shared preferences
+    final sharedPreferences = await SharedPreferences.getInstance();
+    final result = await sharedPreferences.setString(
+      "primaryAppColor",
+      primaryColor.value.toString(),
+    );
+    debugPrint(result.toString());
   }
 }
 

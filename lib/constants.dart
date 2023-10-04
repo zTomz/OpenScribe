@@ -1,5 +1,4 @@
 import 'package:openscribe/models/document.dart';
-import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final documentProvider = StateNotifierProvider<DocumentNotifier, List<Document>>(

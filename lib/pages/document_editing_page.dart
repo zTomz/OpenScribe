@@ -1,6 +1,5 @@
 import 'package:openscribe/constants.dart';
 import 'package:openscribe/models/document.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -100,12 +99,9 @@ class DocumentEditingPage extends HookConsumerWidget {
                             .read(documentProvider.notifier)
                             .changeTitle(value, document.uuid);
 
-                        // Else it will reset the content of document to empty, but in production it works (where no hot reload takes place)
-                        if (kDebugMode) {
-                          ref.read(currentDocumentProvider.notifier).state = ref
-                              .read(documentProvider.notifier)
-                              .getDocumentWithUuid(document.uuid);
-                        }
+                        ref.read(currentDocumentProvider.notifier).state = ref
+                            .read(documentProvider.notifier)
+                            .getDocumentWithUuid(document.uuid);
                       } catch (error) {
                         ScaffoldMessenger.of(context).clearSnackBars();
                         ScaffoldMessenger.of(context).showSnackBar(

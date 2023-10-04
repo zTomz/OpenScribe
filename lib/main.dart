@@ -3,6 +3,7 @@ import 'package:openscribe/document_page_overlay_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
@@ -32,10 +33,13 @@ void main() async {
 
   AdaptiveThemeMode? savedThemeMode = await AdaptiveTheme.getThemeMode();
 
+  final primaryColor = await loadPrimaryColor();
+
   runApp(
     ProviderScope(
       child: MyApp(
         savedThemeMode: savedThemeMode,
+        primaryColor: primaryColor,
       ),
     ),
   );
@@ -43,8 +47,13 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final AdaptiveThemeMode? savedThemeMode;
+  final Color? primaryColor;
 
-  const MyApp({super.key, this.savedThemeMode});
+  const MyApp({
+    super.key,
+    this.savedThemeMode,
+    this.primaryColor,
+  });
 
   // This widget is the root of your application.
   @override
@@ -52,11 +61,15 @@ class MyApp extends StatelessWidget {
     return AdaptiveTheme(
       light: ThemeData(
         useMaterial3: true,
-        colorScheme: const ColorScheme.light(),
+        colorScheme: ColorScheme.light(
+          primary: primaryColor ?? Colors.orange,
+        ),
       ),
       dark: ThemeData(
         useMaterial3: true,
-        colorScheme: const ColorScheme.dark(),
+        colorScheme: ColorScheme.dark(
+          primary: primaryColor ?? Colors.orange,
+        ),
       ),
       // debugShowFloatingThemeButton: true,
       initial: savedThemeMode ?? AdaptiveThemeMode.system,
@@ -89,4 +102,15 @@ class MyApp extends StatelessWidget {
       },
     );
   }
+}
+
+Future<Color?> loadPrimaryColor() async {
+  final sharedPreferences = await SharedPreferences.getInstance();
+  final primaryColor = sharedPreferences.getString("primaryAppColor");
+
+  if (primaryColor == null) {
+    return null;
+  }
+
+  return Color(int.parse(primaryColor));
 }
