@@ -12,21 +12,27 @@ class DocumentEditingPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    final zoom = ref.watch(zoomProvider); // Normal zoom
+
     Document document = ref.watch(currentDocumentProvider);
 
     final titleController = useTextEditingController();
     final textController = useTextEditingController();
 
-    titleController.text = (document.title ?? "Unknown")
-        .replaceAll(
-          ".edoc",
-          "",
-        )
-        .replaceAll(
-          ".txt",
-          "",
-        );
-    textController.text = document.text;
+    if (document.title != titleController.text) {
+      titleController.text = (document.title ?? "Unknown")
+          .replaceAll(
+            ".edoc",
+            "",
+          )
+          .replaceAll(
+            ".txt",
+            "",
+          );
+    }
+    if (document.text != textController.text) {
+      textController.text = document.text;
+    }
 
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
@@ -98,6 +104,20 @@ class DocumentEditingPage extends HookConsumerWidget {
             );
           }
         },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.equal):
+            () {
+          ref.read(zoomProvider.notifier).state += 5;
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.minus):
+            () {
+          if (zoom >= 10) {
+            ref.read(zoomProvider.notifier).state -= 5;
+          }
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit0):
+            () {
+          ref.read(zoomProvider.notifier).state = 100;
+        }
       },
       child: Focus(
         autofocus: true,
@@ -155,6 +175,10 @@ class DocumentEditingPage extends HookConsumerWidget {
                             document.uuid,
                           );
                     },
+                    style: TextStyle(
+                      fontSize: 16 *
+                          (zoom / 100), // The zoom only controls the font size
+                    ),
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: "Enter your text here",

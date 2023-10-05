@@ -142,6 +142,54 @@ class WindowButtonBar extends HookConsumerWidget {
             ],
           ),
           const SizedBox(width: 5),
+          MenuAnchor(
+            builder: (context, controller, child) => TextButton(
+              onPressed: () {
+                if (controller.isOpen) {
+                  controller.close();
+                } else {
+                  controller.open();
+                }
+              },
+              style: TextButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              child: const Text("View"),
+            ),
+            menuChildren: [
+              MenuItemButton(
+                onPressed: () {
+                  ref.read(zoomProvider.notifier).state += 10;
+                },
+                child: const CustomMenuButton(
+                  text: "Zoom in",
+                  shortcut: "Control + Plus",
+                ),
+              ),
+              MenuItemButton(
+                onPressed: () {
+                  if (ref.read(zoomProvider.notifier).state >= 10) {
+                    ref.read(zoomProvider.notifier).state -= 10;
+                  }
+                },
+                child: const CustomMenuButton(
+                  text: "Zoom out",
+                  shortcut: "Control + Minus",
+                ),
+              ),
+              MenuItemButton(
+                onPressed: () {
+                  ref.read(zoomProvider.notifier).state = 100;
+                },
+                child: const CustomMenuButton(
+                  text: "Reset zoom",
+                  shortcut: "Control + 0",
+                ),
+              ),
+            ],
+          ),
           const Spacer(),
           SizedBox(
             width: 25,

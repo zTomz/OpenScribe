@@ -10,6 +10,8 @@ final currentDocumentProvider = StateProvider<Document>(
   (ref) => ref.read(documentProvider.notifier).getFirstDocument(),
 );
 
+final zoomProvider = StateProvider<double>((ref) => 100.0);
+
 const double windowTitleBarHeight = 40.0;
 
 class MemoryLocations {
