@@ -30,6 +30,30 @@ class DocumentEditingPage extends HookConsumerWidget {
 
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyN): () {
+          // Create a new document and asign it to currentDocumentProvider
+          ref.read(currentDocumentProvider.notifier).state =
+              ref.read(documentProvider.notifier).createNew();
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyO):
+            () async {
+          try {
+            ref.read(currentDocumentProvider.notifier).state =
+                await ref.read(documentProvider.notifier).openDocument();
+          } catch (error) {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).clearSnackBars();
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  error.toString(),
+                ),
+              ),
+            );
+          }
+        },
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyS):
             () async {
           try {
@@ -52,16 +76,14 @@ class DocumentEditingPage extends HookConsumerWidget {
             );
           }
         },
-        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyN): () {
-          // Create a new document and asign it to currentDocumentProvider
-          ref.read(currentDocumentProvider.notifier).state =
-              ref.read(documentProvider.notifier).createNew();
-        },
-        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyL):
-            () async {
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.shift,
+            LogicalKeyboardKey.keyS): () async {
           try {
-            ref.read(currentDocumentProvider.notifier).state =
-                await ref.read(documentProvider.notifier).loadDocument();
+            ref.read(documentProvider.notifier).changeText(
+                  textController.text,
+                  document.uuid,
+                );
+            await ref.read(documentProvider.notifier).saveAs(document);
           } catch (error) {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).clearSnackBars();
@@ -75,7 +97,7 @@ class DocumentEditingPage extends HookConsumerWidget {
               ),
             );
           }
-        }
+        },
       },
       child: Focus(
         autofocus: true,

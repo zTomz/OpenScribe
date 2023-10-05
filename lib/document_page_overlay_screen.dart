@@ -2,14 +2,13 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:openscribe/constants.dart';
 import 'package:openscribe/models/document.dart';
 import 'package:openscribe/pages/document_editing_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:openscribe/pages/settings_page.dart';
 import 'package:openscribe/widgets/documents_tab.dart';
+import 'package:openscribe/widgets/window_button_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -101,163 +100,7 @@ class _DocumentPageOverlayScreenState
               ],
             ),
           ),
-          Container(
-            height: 20,
-            margin: const EdgeInsets.only(left: 5, top: 5),
-            child: Row(
-              children: [
-                MenuAnchor(
-                  builder: (context, controller, child) => TextButton(
-                    onPressed: () {
-                      if (controller.isOpen) {
-                        controller.close();
-                      } else {
-                        controller.open();
-                      }
-                    },
-                    style: TextButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                    child: const Text("File"),
-                  ),
-                  menuChildren: [
-                    MenuItemButton(
-                      onPressed: () {
-                        ref.read(currentDocumentProvider.notifier).state =
-                            ref.read(documentProvider.notifier).createNew();
-                      },
-                      child: Row(
-                        children: [
-                          SvgPicture.asset(
-                            "assets/icons/document.svg",
-                            color: colorScheme.primary,
-                            width: 20,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            "New Document",
-                            style: TextStyle(
-                              color: colorScheme.primary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    MenuItemButton(
-                      onPressed: () async {
-                        try {
-                          final currentDocument =
-                              ref.read(currentDocumentProvider.notifier).state;
-
-                          ref.read(documentProvider.notifier).changeText(
-                                currentDocument.text,
-                                currentDocument.uuid,
-                              );
-                          await ref
-                              .read(documentProvider.notifier)
-                              .save(currentDocument);
-
-                          ref.read(currentDocumentProvider.notifier).state = ref
-                              .read(documentProvider.notifier)
-                              .getDocumentWithUuid(currentDocument.uuid);
-                        } catch (error) {
-                          // ignore: use_build_context_synchronously
-                          ScaffoldMessenger.of(context).clearSnackBars();
-                          // ignore: use_build_context_synchronously
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              behavior: SnackBarBehavior.floating,
-                              content: Text(
-                                error.toString(),
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          SvgPicture.asset(
-                            "assets/icons/disk.svg",
-                            color: colorScheme.primary,
-                            width: 20,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            "Save Document",
-                            style: TextStyle(
-                              color: colorScheme.primary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    MenuItemButton(
-                      onPressed: () async {
-                        try {
-                          ref.read(currentDocumentProvider.notifier).state =
-                              await ref
-                                  .read(documentProvider.notifier)
-                                  .loadDocument();
-                        } catch (error) {
-                          // ignore: use_build_context_synchronously
-                          ScaffoldMessenger.of(context).clearSnackBars();
-                          // ignore: use_build_context_synchronously
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              behavior: SnackBarBehavior.floating,
-                              content: Text(
-                                error as String,
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          SvgPicture.asset(
-                            "assets/icons/folder.svg",
-                            color: colorScheme.primary,
-                            width: 20,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            "Load Document",
-                            style: TextStyle(
-                              color: colorScheme.primary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 5),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const SettingsPage(),
-                      ),
-                    );
-                  },
-                  style: TextButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
-                  child: const Text("Settings"),
-                ),
-              ],
-            ),
-          ),
+          const WindowButtonBar(),
           const Expanded(
             child: DocumentEditingPage(),
           ),

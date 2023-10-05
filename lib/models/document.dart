@@ -70,9 +70,9 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     return newDoc;
   }
 
-  Future<Document> loadDocument() async {
+  Future<Document> openDocument() async {
     final result = await FilePicker.platform.pickFiles(
-      dialogTitle: "Load file",
+      dialogTitle: "Open document",
       type: FileType.custom,
       allowedExtensions: ["edoc", "txt"],
     );
@@ -116,7 +116,6 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     }
 
     final Map<String, dynamic> data = jsonDecode(await file.readAsString());
-    print("Data: $data");
 
     if (removeOldDocument) {
       await file.delete();
@@ -197,13 +196,40 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
       if (result != null) {
         diskLocation = result;
       } else {
-        throw ("User cancelled the picker.",);
+        throw "You have to pick a location.";
       }
     }
 
-    // ignore: unnecessary_null_comparison
-    if (diskLocation == null) {
-      return;
+    final file = File(diskLocation);
+    if (file.existsSync()) {
+      file.writeAsStringSync(doc.text);
+    } else {
+      file.createSync();
+      file.writeAsStringSync(doc.text);
+    }
+
+    // Update the state, remove the old document and add the updatet one
+    state = [
+      doc.copyWith(diskLocation: diskLocation),
+      for (final document in state)
+        if (document.uuid != doc.uuid) document,
+    ];
+  }
+
+  Future<void> saveAs(Document doc) async {
+    String? diskLocation;
+
+    final result = await FilePicker.platform.saveFile(
+      dialogTitle: "Save file",
+      fileName: "${doc.title ?? "Unknown"}.edoc",
+      type: FileType.custom,
+      allowedExtensions: ["edoc", "txt"],
+    );
+
+    if (result != null) {
+      diskLocation = result;
+    } else {
+      throw "You have to pick a location.";
     }
 
     final file = File(diskLocation);
