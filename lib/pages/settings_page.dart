@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openscribe/constants.dart';
+import 'package:openscribe/utils/font.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -16,6 +17,8 @@ class SettingsPage extends HookConsumerWidget {
 
     ValueNotifier<Color> primaryColor = useState(colorScheme.primary);
     final showColorPicker = useState(false);
+
+    final font = ref.watch(fontProvider);
 
     return Scaffold(
       body: Column(
@@ -108,6 +111,37 @@ class SettingsPage extends HookConsumerWidget {
                       hueBorderRadius: BorderRadius.circular(20),
                       paletteBorderRadius: BorderRadius.circular(20),
                     ),
+                  const SizedBox(height: 10),
+                  Text("Text", style: Theme.of(context).textTheme.titleLarge),
+                  ListTile(
+                    title: const Text("Font"),
+                    trailing: DropdownButton(
+                      value: font ?? "Default",
+                      items: fontFamilies.keys.map((key) {
+                        return DropdownMenuItem(
+                          value: key ?? "Default",
+                          child: Text(
+                            key ?? "Default",
+                            style: fontFamilies[key] ?? const TextStyle(),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) async {
+                        if (value == null) return;
+
+                        ref.read(fontProvider.notifier).state = value;
+                        await changeFontFamily(
+                          context,
+                          value,
+                        );
+                      },
+                      alignment: Alignment.centerLeft,
+                      borderRadius: BorderRadius.circular(10),
+                      padding: const EdgeInsets.all(10),
+                      underline: const SizedBox.shrink(),
+                      icon: const Icon(Icons.font_download_rounded),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -138,7 +172,7 @@ class SettingsPage extends HookConsumerWidget {
       MemoryLocations.primaryAppColor,
       primaryColor.value.toString(),
     );
-    debugPrint(result.toString());
+    debugPrint("Status saving primary color: $result");
   }
 }
 

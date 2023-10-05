@@ -7,6 +7,7 @@ import 'package:openscribe/models/document.dart';
 import 'package:openscribe/pages/document_editing_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:openscribe/utils/font.dart';
 import 'package:openscribe/widgets/documents_tab.dart';
 import 'package:openscribe/widgets/window_button_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,6 +27,7 @@ class _DocumentPageOverlayScreenState
   void initState() {
     super.initState();
 
+    loadFont(context);
     windowManager.addListener(this);
   }
 
@@ -106,6 +108,30 @@ class _DocumentPageOverlayScreenState
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> loadFont(BuildContext context) async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    String? fontFamily =
+        sharedPreferences.getString(MemoryLocations.fontFamily);
+
+    if (fontFamily == null) {
+      return;
+    }
+
+    if (fontFamily == "Default") {
+      return;
+    }
+
+    print(fontFamily);
+
+    ref.read(fontProvider.notifier).state = fontFamily;
+
+    // ignore: use_build_context_synchronously
+    changeFontFamily(
+      context,
+      fontFamily,
     );
   }
 
