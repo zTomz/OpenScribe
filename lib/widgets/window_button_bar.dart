@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:openscribe/constants.dart';
 import 'package:openscribe/pages/settings_page.dart';
+import 'package:openscribe/utils/provider.dart';
 
 class WindowButtonBar extends HookConsumerWidget {
   const WindowButtonBar({super.key});

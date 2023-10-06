@@ -5,6 +5,8 @@ import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openscribe/constants.dart';
 import 'package:openscribe/utils/font.dart';
+import 'package:openscribe/utils/provider.dart';
+import 'package:openscribe/utils/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -18,7 +20,7 @@ class SettingsPage extends HookConsumerWidget {
     ValueNotifier<Color> primaryColor = useState(colorScheme.primary);
     final showColorPicker = useState(false);
 
-    final font = ref.watch(fontProvider);
+    final settings = ref.watch(settingsProvider);
 
     return Scaffold(
       body: Column(
@@ -116,7 +118,7 @@ class SettingsPage extends HookConsumerWidget {
                   ListTile(
                     title: const Text("Font"),
                     trailing: DropdownButton(
-                      value: font ?? "Default",
+                      value: settings.font ?? "Default",
                       items: fontFamilies.keys.map((key) {
                         return DropdownMenuItem(
                           value: key ?? "Default",
@@ -129,7 +131,9 @@ class SettingsPage extends HookConsumerWidget {
                       onChanged: (value) async {
                         if (value == null) return;
 
-                        ref.read(fontProvider.notifier).state = value;
+                        ref
+                            .read(settingsProvider.notifier)
+                            .changeFontFamily(value);
                         await changeFontFamily(
                           context,
                           value,
@@ -140,6 +144,43 @@ class SettingsPage extends HookConsumerWidget {
                       padding: const EdgeInsets.all(10),
                       underline: const SizedBox.shrink(),
                       icon: const Icon(Icons.font_download_rounded),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Storage",
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  ListTile(
+                    title: const Text("When editor is launched"),
+                    trailing: DropdownButton<WhenEditorLaunched>(
+                      value: settings.whenEditorLaunched,
+                      items: const [
+                        DropdownMenuItem(
+                          value: WhenEditorLaunched.documentsFromOlderSession,
+                          child: Text(
+                            "Load files from older session   ",
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: WhenEditorLaunched.newSession,
+                          child: Text(
+                            "Open a new session",
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value == null) return;
+
+                        ref
+                            .read(settingsProvider.notifier)
+                            .changeWhenEditorLaunched(value);
+                      },
+                      alignment: Alignment.centerLeft,
+                      borderRadius: BorderRadius.circular(10),
+                      padding: const EdgeInsets.all(10),
+                      underline: const SizedBox.shrink(),
+                      icon: const Icon(Icons.save_rounded),
                     ),
                   ),
                 ],

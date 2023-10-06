@@ -6,6 +6,8 @@ import 'package:openscribe/document_page_overlay_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:openscribe/utils/provider.dart';
+import 'package:openscribe/utils/settings.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
@@ -123,53 +125,60 @@ class _MyAppState extends ConsumerState<MyApp> {
   }
 
   Future<void> loadOlderSessions() async {
-    final sharedPreferences = await SharedPreferences.getInstance();
-    final documentsUuids = sharedPreferences.getStringList(
-      MemoryLocations.documentsFromOlderSessions,
-    );
+    await ref.read(settingsProvider.notifier).load();
+    final settings = ref.read(settingsProvider.notifier).getSettings;
 
-    debugPrint("Old uuid's of documents: $documentsUuids");
-
-    // No saved documents from older sessions
-    if (documentsUuids == null || documentsUuids.isEmpty) {
+    if (settings.whenEditorLaunched == WhenEditorLaunched.newSession) {
       return;
-    }
+    } else {
+      final sharedPreferences = await SharedPreferences.getInstance();
+      final documentsUuids = sharedPreferences.getStringList(
+        MemoryLocations.documentsFromOlderSessions,
+      );
 
-    final directory = Directory(
-      "${MemoryLocations.applicationDocumentsDirectory}\\${MemoryLocations.documentsCacheLocation}",
-    );
+      debugPrint("Old uuid's of documents: $documentsUuids");
 
-    // Folder got deleted
-    if (!directory.existsSync() || directory.listSync().isEmpty) {
-      await _cleanDocumentsSharedPreferences();
-      return;
-    }
-
-    ref.read(documentProvider.notifier).clear();
-
-    for (final uuid in documentsUuids) {
-      try {
-        await ref.read(documentProvider.notifier).loadDocumentFromCache(
-              uuid,
-              removeOldDocument: true,
-            );
-      } catch (error) {
-        debugPrint("Error loading document:\n$error");
-
-        ref.read(documentProvider.notifier).deleteCachedDocuments();
-
-        await _cleanDocumentsSharedPreferences();
-
-        ref.read(documentProvider.notifier).createNew();
+      // No saved documents from older sessions
+      if (documentsUuids == null || documentsUuids.isEmpty) {
         return;
       }
+
+      final directory = Directory(
+        "${MemoryLocations.applicationDocumentsDirectory}\\${MemoryLocations.documentsCacheLocation}",
+      );
+
+      // Folder got deleted
+      if (!directory.existsSync() || directory.listSync().isEmpty) {
+        await _cleanDocumentsSharedPreferences();
+        return;
+      }
+
+      ref.read(documentProvider.notifier).clear();
+
+      for (final uuid in documentsUuids) {
+        try {
+          await ref.read(documentProvider.notifier).loadDocumentFromCache(
+                uuid,
+                removeOldDocument: true,
+              );
+        } catch (error) {
+          debugPrint("Error loading document:\n$error");
+
+          ref.read(documentProvider.notifier).deleteCachedDocuments();
+
+          await _cleanDocumentsSharedPreferences();
+
+          ref.read(documentProvider.notifier).createNew();
+          return;
+        }
+      }
+
+      await _cleanDocumentsSharedPreferences();
+
+      // Set current document to first document
+      ref.read(currentDocumentProvider.notifier).state =
+          ref.read(documentProvider.notifier).getFirstDocument();
     }
-
-    await _cleanDocumentsSharedPreferences();
-
-    // Set current document to first document
-    ref.read(currentDocumentProvider.notifier).state =
-        ref.read(documentProvider.notifier).getFirstDocument();
   }
 
   Future<void> _cleanDocumentsSharedPreferences() async {

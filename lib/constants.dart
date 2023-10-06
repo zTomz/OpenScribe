@@ -1,16 +1,4 @@
-import 'package:openscribe/models/document.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-final documentProvider =
-    StateNotifierProvider<DocumentNotifier, List<Document>>(
-  (ref) => DocumentNotifier(),
-);
-
-final currentDocumentProvider = StateProvider<Document>(
-  (ref) => ref.read(documentProvider.notifier).getFirstDocument(),
-);
-
-final zoomProvider = StateProvider<double>((ref) => 100.0);
+import 'package:flutter/foundation.dart';
 
 const double windowTitleBarHeight = 40.0;
 
@@ -22,3 +10,5 @@ class MemoryLocations {
   static const String documentsCacheLocation = "OpenScribe/Cache Documents/";
   static String? applicationDocumentsDirectory;
 }
+
+const bool canCloseWindow = kDebugMode ? false : true;

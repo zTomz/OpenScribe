@@ -1,9 +1,9 @@
-import 'package:openscribe/constants.dart';
 import 'package:openscribe/models/document.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:openscribe/utils/provider.dart';
 
 class DocumentEditingPage extends HookConsumerWidget {
   const DocumentEditingPage({super.key});
@@ -122,42 +122,41 @@ class DocumentEditingPage extends HookConsumerWidget {
           ref.read(zoomProvider.notifier).state = 100;
         }
       },
-      child: Focus(
-        autofocus: true,
-        child: Scaffold(
-          backgroundColor: colorScheme.background,
-          body: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 35,
-                  child: TextField(
-                    controller: titleController,
-                    style: const TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    onChanged: (value) {
-                      try {
-                        ref.read(currentDocumentProvider.notifier).state = ref
-                            .read(documentProvider.notifier)
-                            .changeTitle(value, document.uuid);
-                      } catch (error) {
-                        ScaffoldMessenger.of(context).clearSnackBars();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            behavior: SnackBarBehavior.floating,
-                            content: Text(
-                              error.toString(),
-                            ),
+      child: Scaffold(
+        backgroundColor: colorScheme.background,
+        body: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 35,
+                child: TextField(
+                  controller: titleController,
+                  style: const TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  onChanged: (value) {
+                    try {
+                      ref.read(currentDocumentProvider.notifier).state = ref
+                          .read(documentProvider.notifier)
+                          .changeTitle(value, document.uuid);
+                    } catch (error) {
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          content: Text(
+                            error.toString(),
                           ),
-                        );
-                      }
-                    },
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      suffix: Container(
+                        ),
+                      );
+                    }
+                  },
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    suffix: ExcludeFocus(
+                      child: Container(
                         width: 25,
                         height: 25,
                         margin: const EdgeInsets.only(right: 2.5),
@@ -181,29 +180,29 @@ Last modified: ${document.formatDateTime(document.lastModified) ?? "Not modified
                     ),
                   ),
                 ),
-                Expanded(
-                  child: TextField(
-                    maxLines: null,
-                    controller: textController,
-                    onChanged: (value) {
-                      ref.read(currentDocumentProvider.notifier).state =
-                          ref.read(documentProvider.notifier).changeText(
-                                textController.text,
-                                document.uuid,
-                              );
-                    },
-                    style: TextStyle(
-                      fontSize: 16 *
-                          (zoom / 100), // The zoom only controls the font size
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Enter your text here",
-                    ),
+              ),
+              Expanded(
+                child: TextField(
+                  controller: textController,
+                  onChanged: (value) {
+                    ref.read(currentDocumentProvider.notifier).state =
+                        ref.read(documentProvider.notifier).changeText(
+                              textController.text,
+                              document.uuid,
+                            );
+                  },
+                  maxLines: null,
+                  style: TextStyle(
+                    fontSize: 16 *
+                        (zoom / 100), // The zoom only controls the font size
+                  ),
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "Enter your text here",
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

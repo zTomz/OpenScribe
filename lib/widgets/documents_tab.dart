@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:openscribe/constants.dart';
 import 'package:openscribe/models/document.dart';
+import 'package:openscribe/utils/provider.dart';
 
 class DocumentTab extends ConsumerWidget {
   final Document document;
@@ -18,6 +18,8 @@ class DocumentTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    final currentDocument = ref.watch(currentDocumentProvider);
 
     return Padding(
       padding: const EdgeInsets.only(left: 10.0, top: 5),
@@ -57,6 +59,10 @@ class DocumentTab extends ConsumerWidget {
                         "",
                       ),
                   overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: document.uuid == currentDocument.uuid
+                          ? colorScheme.primary
+                          : colorScheme.onBackground),
                 ),
               ),
               InkWell(
@@ -79,8 +85,7 @@ class DocumentTab extends ConsumerWidget {
                           document.uuid,
                         );
 
-                    if (ref.read(currentDocumentProvider.notifier).state.uuid ==
-                        document.uuid) {
+                    if (currentDocument.uuid == document.uuid) {
                       ref.read(currentDocumentProvider.notifier).state = ref
                           .read(documentProvider.notifier)
                           .getFirstDocument();
@@ -132,8 +137,7 @@ class DocumentTab extends ConsumerWidget {
                       ),
                     );
 
-                    if (ref.read(currentDocumentProvider.notifier).state.uuid ==
-                        document.uuid) {
+                    if (currentDocument.uuid == document.uuid) {
                       ref.read(currentDocumentProvider.notifier).state = ref
                           .read(documentProvider.notifier)
                           .getFirstDocument();

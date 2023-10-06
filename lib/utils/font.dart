@@ -1,7 +1,6 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openscribe/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -72,8 +71,6 @@ Future<void> changeFontFamily(BuildContext context, String fontName) async {
   );
   debugPrint("Status saving font [$fontName]: $result");
 }
-
-final fontProvider = StateProvider<String?>((ref) => null);
 
 final Map<String?, TextStyle> fontFamilies = {
   null: const TextStyle(),
