@@ -62,7 +62,7 @@ class Document {
 
   @override
   String toString() {
-    return 'Document(title: $title, text: $text, diskLocation: $diskLocation, uuid: $uuid)';
+    return 'Document(title: $title, text: $text, diskLocation: $diskLocation, uuid: $uuid, lastSaved: $lastSaved, lastModified: $lastModified)';
   }
 
   String? formatDateTime(DateTime? dateTime) {
@@ -100,7 +100,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     if (result == null ||
         result.files.isEmpty ||
         result.files.single.path == null) {
-      throw "Cannot open specified file.";
+      throw "Cannot open the specified file.";
     }
 
     Document newDoc = Document(
@@ -163,14 +163,26 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     Document doc = state.firstWhere((doc) => doc.uuid == uuid);
 
     if (doc.diskLocation != null) {
+      if (!(File(doc.diskLocation!).existsSync())) {
+        doc = Document(
+          title: newTitle,
+          text: doc.text,
+          diskLocation: null,
+          uuid: doc.uuid,
+        );
+        state = [
+          doc,
+          for (final document in state)
+            if (document.uuid != uuid) document,
+        ];
+        return doc;
+      }
+
       List<String> newPathList = doc.diskLocation!.split("\\");
       newPathList.removeLast();
       String newPath = newPathList.join("\\");
 
       if (File("$newPath\\$newTitle.edoc").existsSync()) {
-        doc = doc.copyWith(
-          title: doc.title,
-        );
         throw "File with same title already exists.";
       }
 
@@ -217,6 +229,10 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
 
   Future<Document> save(Document doc) async {
     String? diskLocation = doc.diskLocation;
+
+    if (!(File(doc.diskLocation!).existsSync())) {
+      diskLocation = null;
+    }
 
     if (diskLocation == null) {
       final result = await FilePicker.platform.saveFile(
