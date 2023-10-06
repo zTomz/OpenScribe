@@ -13,8 +13,8 @@ import 'package:window_manager/window_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  MemoryLocations.applicationDocumentsDirectory = (await getApplicationDocumentsDirectory()).path;
-  print("Documents directory: ${MemoryLocations.applicationDocumentsDirectory}");
+  MemoryLocations.applicationDocumentsDirectory =
+      (await getApplicationDocumentsDirectory()).path;
 
   await windowManager.ensureInitialized();
   await Window.initialize();

@@ -1,9 +1,12 @@
+// ignore_for_file: unnecessary_string_interpolations
+
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:openscribe/constants.dart';
 import 'package:uuid/uuid.dart';
 
@@ -13,12 +16,16 @@ class Document {
   final String text;
   final String? diskLocation;
   final String uuid;
+  final DateTime? lastSaved;
+  final DateTime? lastModified;
 
   const Document({
     required this.title,
     required this.text,
     required this.diskLocation,
     required this.uuid,
+    this.lastSaved,
+    this.lastModified,
   });
 
   static Document empty() {
@@ -27,6 +34,8 @@ class Document {
       text: "",
       diskLocation: null,
       uuid: const Uuid().v4(),
+      lastSaved: null,
+      lastModified: DateTime.now(),
     );
   }
 
@@ -34,24 +43,36 @@ class Document {
     String? title,
     String? text,
     String? diskLocation,
+    DateTime? lastSaved,
   }) {
     return Document(
       title: title ?? this.title,
       text: text ?? this.text,
       diskLocation: diskLocation ?? this.diskLocation,
       uuid: uuid,
+      lastSaved: lastSaved ?? this.lastSaved,
+      lastModified: DateTime.now(),
     );
-  }
-
-  @override
-  String toString() {
-    return 'Document(title: $title, text: $text, diskLocation: $diskLocation, uuid: $uuid)';
   }
 
   bool get isEmpty => title == null && text.isEmpty && diskLocation == null;
   bool get isNotEmpty => !isEmpty;
   bool get isNotSaved => title != null && diskLocation == null;
   bool get isSaved => diskLocation != null;
+
+  @override
+  String toString() {
+    return 'Document(title: $title, text: $text, diskLocation: $diskLocation, uuid: $uuid)';
+  }
+
+  String? formatDateTime(DateTime? dateTime) {
+    if (dateTime == null) {
+      return null;
+    }
+
+    final DateFormat formatter = DateFormat('dd.MM.yyyy | HH:mm:ss');
+    return formatter.format(dateTime);
+  }
 }
 
 class DocumentNotifier extends StateNotifier<List<Document>> {
@@ -124,6 +145,10 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
       diskLocation:
           data["diskLocation"] == "null" ? null : data["diskLocation"],
       uuid: uuid,
+      lastSaved: data["lastSaved"] == "null"
+          ? null
+          : DateTime.parse(data["lastSaved"]),
+      lastModified: DateTime.now(),
     );
 
     state = [
@@ -134,7 +159,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     return newDoc;
   }
 
-  void changeTitle(String newTitle, String uuid) {
+  Document changeTitle(String newTitle, String uuid) {
     Document doc = state.firstWhere((doc) => doc.uuid == uuid);
 
     if (doc.diskLocation != null) {
@@ -155,7 +180,13 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
         title: newTitle,
         diskLocation: "$newPath\\$newTitle.edoc",
       );
-      return;
+      // Update the state, remove the old document and add the updatet one
+      state = [
+        doc,
+        for (final document in state)
+          if (document.uuid != uuid) document,
+      ];
+      return doc;
     }
 
     doc = doc.copyWith(title: newTitle);
@@ -166,17 +197,22 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
       for (final document in state)
         if (document.uuid != uuid) document,
     ];
+
+    return doc;
   }
 
-  void changeText(String newText, String uuid) {
+  Document changeText(String newText, String uuid) {
     Document doc = state.firstWhere((doc) => doc.uuid == uuid);
+    doc = doc.copyWith(text: newText);
 
     // Update the state, remove the old document and add the updatet one
     state = [
-      doc.copyWith(text: newText),
+      doc,
       for (final document in state)
         if (document.uuid != uuid) document,
     ];
+
+    return doc;
   }
 
   Future<Document> save(Document doc) async {
@@ -209,6 +245,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     final updatetDoc = doc.copyWith(
       title: doc.title ?? "Unknown",
       diskLocation: diskLocation,
+      lastSaved: DateTime.now(),
     );
 
     state = [
@@ -248,6 +285,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     final updatetDoc = doc.copyWith(
       title: doc.title ?? "Unknown",
       diskLocation: diskLocation,
+      lastSaved: DateTime.now(),
     );
 
     state = [
@@ -279,10 +317,12 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     }
 
     final dataToWrite = {
-      "\"title\"": "\"${document.title ?? "Unknown"}\"",
-      "\"text\"": "\"${document.text}\"",
-      "\"diskLocation\"":
+      '"title"': '"${document.title ?? "Unknown"}"',
+      '"text"': '"${document.text}"',
+      '"diskLocation"':
           '"${(document.diskLocation ?? "null").replaceAll("\\", "\\\\")}"',
+      '"lastSaved"':
+          '"${document.lastSaved == null ? "null" : document.lastSaved!.toIso8601String()}"',
     };
 
     file.createSync(recursive: true);

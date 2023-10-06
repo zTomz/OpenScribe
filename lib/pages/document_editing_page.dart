@@ -140,13 +140,9 @@ class DocumentEditingPage extends HookConsumerWidget {
                     ),
                     onChanged: (value) {
                       try {
-                        ref
-                            .read(documentProvider.notifier)
-                            .changeTitle(value, document.uuid);
-
                         ref.read(currentDocumentProvider.notifier).state = ref
                             .read(documentProvider.notifier)
-                            .getDocumentWithUuid(document.uuid);
+                            .changeTitle(value, document.uuid);
                       } catch (error) {
                         ScaffoldMessenger.of(context).clearSnackBars();
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -167,7 +163,9 @@ class DocumentEditingPage extends HookConsumerWidget {
                         margin: const EdgeInsets.only(right: 2.5),
                         child: Tooltip(
                           message: """
-Disk location: ${document.diskLocation ?? "Not saved"}""",
+Disk location: ${document.diskLocation ?? "Not saved"}
+Last save: ${document.formatDateTime(document.lastSaved) ?? "Not saved"}
+Last modified: ${document.formatDateTime(document.lastModified) ?? "Not modified"}""",
                           child: InkWell(
                             onTap: () {},
                             hoverColor: Colors.grey.withOpacity(0.3),
@@ -189,13 +187,10 @@ Disk location: ${document.diskLocation ?? "Not saved"}""",
                     controller: textController,
                     onChanged: (value) {
                       ref.read(currentDocumentProvider.notifier).state =
-                          document.copyWith(
-                        text: textController.text,
-                      );
-                      ref.read(documentProvider.notifier).changeText(
-                            textController.text,
-                            document.uuid,
-                          );
+                          ref.read(documentProvider.notifier).changeText(
+                                textController.text,
+                                document.uuid,
+                              );
                     },
                     style: TextStyle(
                       fontSize: 16 *
