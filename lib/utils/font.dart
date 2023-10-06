@@ -6,16 +6,15 @@ import 'package:openscribe/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> changeFontFamily(BuildContext context, String fontName) async {
-  final newFontFamily = fontFamilies[fontName];
+  TextStyle? newFontFamily = fontFamilies[fontName];
 
   if (newFontFamily == null) {
     return;
   }
 
+  newFontFamily = newFontFamily.copyWith(inherit: true);
 
   final textTheme = Theme.of(context).textTheme;
-
-  print(textTheme.headlineLarge);
 
   final newTextTheme = textTheme.copyWith(
     headlineLarge: newFontFamily.copyWith(
@@ -55,8 +54,6 @@ Future<void> changeFontFamily(BuildContext context, String fontName) async {
       fontWeight: (textTheme.bodySmall ?? const TextStyle()).fontWeight,
     ),
   );
-
-  await Future.delayed(const Duration(seconds: 1));
 
   AdaptiveTheme.of(context).setTheme(
     light: AdaptiveTheme.of(context).lightTheme.copyWith(

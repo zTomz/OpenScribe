@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
@@ -124,8 +123,6 @@ class _DocumentPageOverlayScreenState
       return;
     }
 
-    print(fontFamily);
-
     ref.read(fontProvider.notifier).state = fontFamily;
 
     // ignore: use_build_context_synchronously
@@ -159,14 +156,15 @@ class _DocumentPageOverlayScreenState
     );
 
     debugPrint(
-        "Saved documents to cache: $result - ${documents.map((e) => e.uuid).toList()}");
+      "Saved documents to cache: $result - ${documents.map((e) => e.uuid).toList()}",
+    );
 
     // Save all saved documents
     await ref.read(documentProvider.notifier).saveAll();
 
     // Exit
-    super.onWindowClose();
-    exit(0);
+    // super.onWindowClose();
+    // exit(0);
 
     // bool dialogGotShown = false;
     // int index = 0;

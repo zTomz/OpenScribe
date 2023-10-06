@@ -1,14 +1,20 @@
+import 'dart:io';
+
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:openscribe/constants.dart';
 import 'package:openscribe/document_page_overlay_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  MemoryLocations.applicationDocumentsDirectory = (await getApplicationDocumentsDirectory()).path;
+  print("Documents directory: ${MemoryLocations.applicationDocumentsDirectory}");
 
   await windowManager.ensureInitialized();
   await Window.initialize();
@@ -17,7 +23,7 @@ void main() async {
 
   WindowOptions windowOptions = const WindowOptions(
     size: Size(800, 600),
-    minimumSize: Size(530, 270),
+    minimumSize: Size(530, 285),
     center: true,
     backgroundColor: Colors.transparent,
     skipTaskbar: false,
@@ -129,6 +135,16 @@ class _MyAppState extends ConsumerState<MyApp> {
       return;
     }
 
+    final directory = Directory(
+      "${MemoryLocations.applicationDocumentsDirectory}\\${MemoryLocations.documentsCacheLocation}",
+    );
+
+    // Folder got deleted
+    if (!directory.existsSync() || directory.listSync().isEmpty) {
+      await _cleanDocumentsSharedPreferences();
+      return;
+    }
+
     ref.read(documentProvider.notifier).clear();
 
     for (final uuid in documentsUuids) {
@@ -142,27 +158,26 @@ class _MyAppState extends ConsumerState<MyApp> {
 
         ref.read(documentProvider.notifier).deleteCachedDocuments();
 
-        final instance = await SharedPreferences.getInstance();
-        await instance.setStringList(
-          MemoryLocations.documentsFromOlderSessions,
-          [],
-        );
+        await _cleanDocumentsSharedPreferences();
 
         ref.read(documentProvider.notifier).createNew();
         return;
       }
     }
 
-    // Clear shared preferences
+    await _cleanDocumentsSharedPreferences();
+
+    // Set current document to first document
+    ref.read(currentDocumentProvider.notifier).state =
+        ref.read(documentProvider.notifier).getFirstDocument();
+  }
+
+  Future<void> _cleanDocumentsSharedPreferences() async {
     final instance = await SharedPreferences.getInstance();
     await instance.setStringList(
       MemoryLocations.documentsFromOlderSessions,
       [],
     );
-
-    // Set current document to first document
-    ref.read(currentDocumentProvider.notifier).state =
-        ref.read(documentProvider.notifier).getFirstDocument();
   }
 }
 

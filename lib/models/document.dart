@@ -5,7 +5,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openscribe/constants.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 @immutable
@@ -100,10 +99,8 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
 
   Future<Document> loadDocumentFromCache(String uuid,
       {bool removeOldDocument = false}) async {
-    final applicationDocumentsDirectory =
-        await getApplicationDocumentsDirectory();
     final path =
-        "${applicationDocumentsDirectory.path}\\${MemoryLocations.documentsCacheLocation}\\$uuid.json";
+        "${MemoryLocations.applicationDocumentsDirectory}\\${MemoryLocations.documentsCacheLocation}\\$uuid.json";
 
     final file = File(path);
 
@@ -182,7 +179,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     ];
   }
 
-  Future<void> save(Document doc) async {
+  Future<Document> save(Document doc) async {
     String? diskLocation = doc.diskLocation;
 
     if (diskLocation == null) {
@@ -209,14 +206,21 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     }
 
     // Update the state, remove the old document and add the updatet one
+    final updatetDoc = doc.copyWith(
+      title: doc.title ?? "Unknown",
+      diskLocation: diskLocation,
+    );
+
     state = [
-      doc.copyWith(diskLocation: diskLocation),
+      updatetDoc,
       for (final document in state)
         if (document.uuid != doc.uuid) document,
     ];
+
+    return updatetDoc;
   }
 
-  Future<void> saveAs(Document doc) async {
+  Future<Document> saveAs(Document doc) async {
     String? diskLocation;
 
     final result = await FilePicker.platform.saveFile(
@@ -241,11 +245,18 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     }
 
     // Update the state, remove the old document and add the updatet one
+    final updatetDoc = doc.copyWith(
+      title: doc.title ?? "Unknown",
+      diskLocation: diskLocation,
+    );
+
     state = [
-      doc.copyWith(diskLocation: diskLocation),
+      updatetDoc,
       for (final document in state)
         if (document.uuid != doc.uuid) document,
     ];
+
+    return updatetDoc;
   }
 
   /// Saves only every already saved document. Unsaved documents are ignored.
@@ -258,10 +269,8 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
   }
 
   Future<void> saveToDocumentsCache(Document document) async {
-    final applicationDocumentsDirectory =
-        await getApplicationDocumentsDirectory();
     final path =
-        "${applicationDocumentsDirectory.path}\\${MemoryLocations.documentsCacheLocation}\\${document.uuid}.json"; // Important: JSON Document, not .edoc, the name of doc is the uuid and the title + text is stored in the document
+        "${MemoryLocations.applicationDocumentsDirectory}\\${MemoryLocations.documentsCacheLocation}\\${document.uuid}.json"; // Important: JSON Document, not .edoc, the name of doc is the uuid and the title + text is stored in the document
     final file = File(path);
 
     // Almost impossible, but just in case
@@ -296,10 +305,8 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
   }
 
   Future<void> deleteCachedDocuments() async {
-    final applicationDocumentsDirectory =
-        await getApplicationDocumentsDirectory();
     Directory cacheDocumentsDirectory = Directory(
-      "${applicationDocumentsDirectory.path}\\${MemoryLocations.documentsCacheLocation}",
+      "${MemoryLocations.applicationDocumentsDirectory}\\${MemoryLocations.documentsCacheLocation}",
     );
 
     await cacheDocumentsDirectory.delete(recursive: true);

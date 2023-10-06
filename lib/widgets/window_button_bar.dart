@@ -77,13 +77,9 @@ class WindowButtonBar extends HookConsumerWidget {
                           currentDocument.text,
                           currentDocument.uuid,
                         );
-                    await ref
+                    ref.read(currentDocumentProvider.notifier).state = await ref
                         .read(documentProvider.notifier)
                         .save(currentDocument);
-
-                    ref.read(currentDocumentProvider.notifier).state = ref
-                        .read(documentProvider.notifier)
-                        .getDocumentWithUuid(currentDocument.uuid);
                   } catch (error) {
                     // ignore: use_build_context_synchronously
                     ScaffoldMessenger.of(context).clearSnackBars();
@@ -113,13 +109,9 @@ class WindowButtonBar extends HookConsumerWidget {
                           currentDocument.text,
                           currentDocument.uuid,
                         );
-                    await ref
+                    ref.read(currentDocumentProvider.notifier).state = await ref
                         .read(documentProvider.notifier)
                         .saveAs(currentDocument);
-
-                    ref.read(currentDocumentProvider.notifier).state = ref
-                        .read(documentProvider.notifier)
-                        .getDocumentWithUuid(currentDocument.uuid);
                   } catch (error) {
                     // ignore: use_build_context_synchronously
                     ScaffoldMessenger.of(context).clearSnackBars();

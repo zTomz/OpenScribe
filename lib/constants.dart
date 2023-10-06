@@ -20,4 +20,5 @@ class MemoryLocations {
   static const String fontFamily = "fontFamily";
 
   static const String documentsCacheLocation = "OpenScribe/Cache Documents/";
+  static String? applicationDocumentsDirectory;
 }

@@ -67,7 +67,9 @@ class DocumentEditingPage extends HookConsumerWidget {
                   textController.text,
                   document.uuid,
                 );
-            await ref.read(documentProvider.notifier).save(document);
+
+            ref.read(currentDocumentProvider.notifier).state =
+                await ref.read(documentProvider.notifier).save(document);
           } catch (error) {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).clearSnackBars();
@@ -89,7 +91,8 @@ class DocumentEditingPage extends HookConsumerWidget {
                   textController.text,
                   document.uuid,
                 );
-            await ref.read(documentProvider.notifier).saveAs(document);
+            ref.read(currentDocumentProvider.notifier).state =
+                await ref.read(documentProvider.notifier).saveAs(document);
           } catch (error) {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).clearSnackBars();
@@ -156,8 +159,27 @@ class DocumentEditingPage extends HookConsumerWidget {
                         );
                       }
                     },
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
+                      suffix: Container(
+                        width: 25,
+                        height: 25,
+                        margin: const EdgeInsets.only(right: 2.5),
+                        child: Tooltip(
+                          message: """
+Disk location: ${document.diskLocation ?? "Not saved"}""",
+                          child: InkWell(
+                            onTap: () {},
+                            hoverColor: Colors.grey.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(5),
+                            child: Icon(
+                              Icons.info_rounded,
+                              size: 18,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
