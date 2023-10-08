@@ -22,7 +22,7 @@ class DocumentEditingPage extends HookConsumerWidget {
     final textController = useTextEditingController();
 
     if (document.title != titleController.text) {
-      titleController.text = (document.title ?? "Unknown")
+      titleController.text = (document.title ?? LocalKeys.unknown.tr())
           .replaceAll(
             ".edoc",
             "",

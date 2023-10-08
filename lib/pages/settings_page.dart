@@ -207,6 +207,45 @@ class SettingsPage extends HookConsumerWidget {
                       icon: const Icon(Icons.save_rounded),
                     ),
                   ),
+                  const SizedBox(height: 10),
+                  Text(
+                    LocalKeys.language.tr(),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge!
+                        .copyWith(color: colorScheme.onBackground),
+                  ),
+                  ListTile(
+                    title: Text(LocalKeys.language.tr()),
+                    trailing: DropdownButton<Locale>(
+                      value: context.locale,
+                      items: languageKeys.keys
+                          .map(
+                            (lang) => DropdownMenuItem(
+                              value: languageKeys[lang],
+                              child: Text(
+                                lang.tr(),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        if (value == null) return;
+
+                        context.setLocale(value);
+                      },
+                      alignment: Alignment.centerLeft,
+                      borderRadius: BorderRadius.circular(10),
+                      padding: const EdgeInsets.all(10),
+                      underline: const SizedBox.shrink(),
+                      icon: const Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Icon(
+                          Icons.language_rounded,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

@@ -40,5 +40,11 @@
     "whenEditorIsLaunched": "When editor is launched",
     "loadFilesFromOlderSession": "Load files from older session",
     "openANewSession": "Open a new session",
-    "settings": "Settings"
+    "settings": "Settings",
+    "language": "Language",
+    "german": "German",
+    "english": "English",
+    "french": "French",
+    "spanish": "Spanish",
+    "italian": "Italian"
 }

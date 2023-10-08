@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 
 const double windowTitleBarHeight = 40.0;
@@ -58,4 +60,18 @@ class LocalKeys {
   static const String loadFilesFromOlderSession = "loadFilesFromOlderSession";
   static const String openANewSession = "openANewSession";
   static const String settings = "settings";
+  static const String language = "language";
+  static const String german = "german";
+  static const String english = "english";
+  static const String french = "french";
+  static const String spanish = "spanish";
+  static const String italian = "italian";
 }
+
+Map<String, Locale> languageKeys = const {
+  LocalKeys.german: Locale("de"),
+  LocalKeys.english: Locale("en"),
+  LocalKeys.french: Locale("fr"),
+  LocalKeys.spanish: Locale("es"),
+  LocalKeys.italian: Locale("it"),
+};

@@ -53,6 +53,9 @@ void main() async {
         supportedLocales: const [
           Locale('en'),
           Locale('de'),
+          Locale('fr'),
+          Locale('es'),
+          Locale('it'),
         ],
         path: 'assets/langs',
         child: MyApp(
@@ -92,14 +95,14 @@ class _MyAppState extends ConsumerState<MyApp> {
     return AdaptiveTheme(
       light: ThemeData(
         useMaterial3: true,
-        brightness: Brightness.light,
+        // brightness: Brightness.light,
         colorScheme: ColorScheme.light(
           primary: widget.primaryColor ?? Colors.orange,
         ),
       ),
       dark: ThemeData(
         useMaterial3: true,
-        brightness: Brightness.dark,
+        // brightness: Brightness.dark,
         colorScheme: ColorScheme.dark(
           primary: widget.primaryColor ?? Colors.orange,
         ),

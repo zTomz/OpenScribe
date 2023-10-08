@@ -41,5 +41,11 @@
     "whenEditorIsLaunched": "Wenn der Editor gestartet wird",
     "loadFilesFromOlderSession": "Lade Dateien aus älterer Sitzung",
     "openANewSession": "Neue Sitzung öffnen",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "language": "Sprache",
+    "german": "Deutsch",
+    "english": "Englisch",
+    "french": "Französisch",
+    "spanish": "Spanisch",
+    "italian": "Italienisch"
 }
