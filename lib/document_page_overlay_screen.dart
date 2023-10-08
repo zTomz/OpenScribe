@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:openscribe/constants.dart';
 import 'package:openscribe/models/document.dart';
 import 'package:openscribe/pages/document_editing_page.dart';
@@ -114,9 +115,13 @@ class _DocumentPageOverlayScreenState
   }
 
   Future<void> initialize(BuildContext context) async {
-    await ref.read(settingsProvider.notifier).load(); // If it is already loaded, it doesnt load again
+    await ref
+        .read(settingsProvider.notifier)
+        .load(); // If it is already loaded, it doesnt load again
 
     final settings = ref.read(settingsProvider.notifier).getSettings;
+
+    print(settings);
 
     if (settings.font == null || settings.font == "Default") {
       return;
@@ -186,18 +191,18 @@ class _DocumentPageOverlayScreenState
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text("Warning"),
+            title: Text(LocalKeys.warning.tr()),
             content: RichText(
               text: TextSpan(
                 children: [
-                  const TextSpan(text: "The docuement "),
+                  TextSpan(text: "${LocalKeys.theDocument.tr()} "),
                   TextSpan(
-                    text: document.title,
+                    text: document.title ?? LocalKeys.unknown.tr(),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const TextSpan(text: " is not saved.")
+                  TextSpan(text: " ${LocalKeys.isNotSaved.tr()}.")
                 ],
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
@@ -217,7 +222,7 @@ class _DocumentPageOverlayScreenState
                     }
                   }
                 },
-                child: const Text("Save"),
+                child: Text(LocalKeys.save.tr()),
               ),
               TextButton(
                 onPressed: () async {
@@ -231,7 +236,7 @@ class _DocumentPageOverlayScreenState
                     }
                   }
                 },
-                child: const Text("Don't save"),
+                child: Text(LocalKeys.dontSave.tr()),
               ),
               TextButton(
                 onPressed: () async {
@@ -244,7 +249,7 @@ class _DocumentPageOverlayScreenState
                     exit(0);
                   }
                 },
-                child: const Text("Quit"),
+                child: Text(LocalKeys.quit.tr()),
               ),
             ],
           ),

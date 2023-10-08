@@ -1,3 +1,5 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:openscribe/constants.dart';
 import 'package:openscribe/models/document.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -132,8 +134,9 @@ class DocumentEditingPage extends HookConsumerWidget {
                 height: 35,
                 child: TextField(
                   controller: titleController,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 25,
+                    color: colorScheme.onBackground,
                     fontWeight: FontWeight.bold,
                   ),
                   onChanged: (value) {
@@ -162,9 +165,9 @@ class DocumentEditingPage extends HookConsumerWidget {
                         margin: const EdgeInsets.only(right: 2.5),
                         child: Tooltip(
                           message: """
-Disk location: ${document.diskLocation ?? "Not saved"}
-Last save: ${document.formatDateTime(document.lastSaved) ?? "Not saved"}
-Last modified: ${document.formatDateTime(document.lastModified) ?? "Not modified"}""",
+${LocalKeys.diskLocation.tr()}: ${document.diskLocation ?? LocalKeys.notSaved.tr()}
+${LocalKeys.lastSaved.tr()}: ${document.formatDateTime(document.lastSaved) ?? LocalKeys.notSaved.tr()}
+${LocalKeys.lastModified.tr()}: ${document.formatDateTime(document.lastModified) ?? LocalKeys.notModified.tr()}""",
                           child: InkWell(
                             onTap: () {},
                             hoverColor: Colors.grey.withOpacity(0.3),
@@ -196,9 +199,9 @@ Last modified: ${document.formatDateTime(document.lastModified) ?? "Not modified
                     fontSize: 16 *
                         (zoom / 100), // The zoom only controls the font size
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     border: InputBorder.none,
-                    hintText: "Enter your text here",
+                    hintText: LocalKeys.enterYourTextHere.tr(),
                   ),
                 ),
               ),

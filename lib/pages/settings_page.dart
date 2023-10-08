@@ -1,4 +1,5 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
@@ -35,24 +36,34 @@ class SettingsPage extends HookConsumerWidget {
               padding: const EdgeInsets.all(16),
               child: ListView(
                 children: [
-                  Text("Theme", style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    LocalKeys.theme.tr(),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge!
+                        .copyWith(color: colorScheme.onBackground),
+                  ),
                   const SizedBox(height: 10),
                   ListTile(
-                    title: const Text("Theme Mode"),
+                    title: Text(LocalKeys.themeMode.tr()),
                     trailing: DropdownButton(
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(color: colorScheme.onBackground),
                       value: AdaptiveTheme.of(context).mode,
-                      items: const [
+                      items: [
                         DropdownMenuItem(
                           value: AdaptiveThemeMode.light,
-                          child: Text("Light"),
+                          child: Text(LocalKeys.light.tr()),
                         ),
                         DropdownMenuItem(
                           value: AdaptiveThemeMode.dark,
-                          child: Text("Dark"),
+                          child: Text(LocalKeys.dark.tr()),
                         ),
                         DropdownMenuItem(
                           value: AdaptiveThemeMode.system,
-                          child: Text("System   "),
+                          child: Text("${LocalKeys.system.tr()}   "),
                         )
                       ],
                       onChanged: (value) {
@@ -74,9 +85,9 @@ class SettingsPage extends HookConsumerWidget {
                   ),
                   const SizedBox(height: 10),
                   ListTile(
-                    title: const Text("Primary Color"),
+                    title: Text(LocalKeys.primaryColor.tr()),
                     trailing: Tooltip(
-                      message: "Toggle color picker",
+                      message: LocalKeys.toggleColorPicker.tr(),
                       child: InkWell(
                         onTap: () {
                           // Color picker gets closed
@@ -114,16 +125,26 @@ class SettingsPage extends HookConsumerWidget {
                       paletteBorderRadius: BorderRadius.circular(20),
                     ),
                   const SizedBox(height: 10),
-                  Text("Text", style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    LocalKeys.text.tr(),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge!
+                        .copyWith(color: colorScheme.onBackground),
+                  ),
                   ListTile(
-                    title: const Text("Font"),
+                    title: Text(LocalKeys.font.tr()),
                     trailing: DropdownButton(
-                      value: settings.font ?? "Default",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(color: colorScheme.onBackground),
+                      value: settings.font ?? LocalKeys.Default.tr(),
                       items: fontFamilies.keys.map((key) {
                         return DropdownMenuItem(
                           value: key ?? "Default",
                           child: Text(
-                            key ?? "Default",
+                            key ?? LocalKeys.Default.tr(),
                             style: fontFamilies[key] ?? const TextStyle(),
                           ),
                         );
@@ -131,13 +152,9 @@ class SettingsPage extends HookConsumerWidget {
                       onChanged: (value) async {
                         if (value == null) return;
 
-                        ref
+                        await ref
                             .read(settingsProvider.notifier)
-                            .changeFontFamily(value);
-                        await changeFontFamily(
-                          context,
-                          value,
-                        );
+                            .changeFontFamily(value, context);
                       },
                       alignment: Alignment.centerLeft,
                       borderRadius: BorderRadius.circular(10),
@@ -148,24 +165,31 @@ class SettingsPage extends HookConsumerWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    "Storage",
-                    style: Theme.of(context).textTheme.titleLarge,
+                    LocalKeys.storage.tr(),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge!
+                        .copyWith(color: colorScheme.onBackground),
                   ),
                   ListTile(
-                    title: const Text("When editor is launched"),
+                    title: Text(LocalKeys.whenEditorIsLaunched.tr()),
                     trailing: DropdownButton<WhenEditorLaunched>(
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(color: colorScheme.onBackground),
                       value: settings.whenEditorLaunched,
-                      items: const [
+                      items: [
                         DropdownMenuItem(
                           value: WhenEditorLaunched.documentsFromOlderSession,
                           child: Text(
-                            "Load files from older session   ",
+                            "${LocalKeys.loadFilesFromOlderSession.tr()}   ",
                           ),
                         ),
                         DropdownMenuItem(
                           value: WhenEditorLaunched.newSession,
                           child: Text(
-                            "Open a new session",
+                            LocalKeys.openANewSession.tr(),
                           ),
                         ),
                       ],
@@ -251,7 +275,7 @@ class SettingsWindowBar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          const Text("Settings"),
+          Text(LocalKeys.settings.tr()),
           Expanded(
             child: WindowCaption(
               backgroundColor: colorScheme.background,

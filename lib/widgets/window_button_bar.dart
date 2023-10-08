@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:openscribe/constants.dart';
 import 'package:openscribe/pages/settings_page.dart';
 import 'package:openscribe/utils/provider.dart';
 
@@ -29,7 +31,7 @@ class WindowButtonBar extends HookConsumerWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
               ),
-              child: const Text("File"),
+              child: Text(LocalKeys.file.tr()),
             ),
             menuChildren: [
               MenuItemButton(
@@ -37,8 +39,8 @@ class WindowButtonBar extends HookConsumerWidget {
                   ref.read(currentDocumentProvider.notifier).state =
                       ref.read(documentProvider.notifier).createNew();
                 },
-                child: const CustomMenuButton(
-                  text: "New document",
+                child: CustomMenuButton(
+                  text: LocalKeys.newDocument.tr(),
                   shortcut: "Control + N",
                 ),
               ),
@@ -62,8 +64,8 @@ class WindowButtonBar extends HookConsumerWidget {
                     );
                   }
                 },
-                child: const CustomMenuButton(
-                  text: "Open",
+                child: CustomMenuButton(
+                  text: LocalKeys.open.tr(),
                   shortcut: "Control + O",
                 ),
               ),
@@ -94,8 +96,8 @@ class WindowButtonBar extends HookConsumerWidget {
                     );
                   }
                 },
-                child: const CustomMenuButton(
-                  text: "Save",
+                child: CustomMenuButton(
+                  text: LocalKeys.save.tr(),
                   shortcut: "Control + S",
                 ),
               ),
@@ -126,8 +128,8 @@ class WindowButtonBar extends HookConsumerWidget {
                     );
                   }
                 },
-                child: const CustomMenuButton(
-                  text: "Save as",
+                child: CustomMenuButton(
+                  text: LocalKeys.saveAs.tr(),
                   shortcut: "Control + Shift + S",
                 ),
               ),
@@ -148,15 +150,15 @@ class WindowButtonBar extends HookConsumerWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
               ),
-              child: const Text("View"),
+              child: Text(LocalKeys.view.tr()),
             ),
             menuChildren: [
               MenuItemButton(
                 onPressed: () {
                   ref.read(zoomProvider.notifier).state += 10;
                 },
-                child: const CustomMenuButton(
-                  text: "Zoom in",
+                child: CustomMenuButton(
+                  text: LocalKeys.zoomIn.tr(),
                   shortcut: "Control + Plus",
                 ),
               ),
@@ -166,8 +168,8 @@ class WindowButtonBar extends HookConsumerWidget {
                     ref.read(zoomProvider.notifier).state -= 10;
                   }
                 },
-                child: const CustomMenuButton(
-                  text: "Zoom out",
+                child: CustomMenuButton(
+                  text: LocalKeys.zoomOut.tr(),
                   shortcut: "Control + Minus",
                 ),
               ),
@@ -175,8 +177,8 @@ class WindowButtonBar extends HookConsumerWidget {
                 onPressed: () {
                   ref.read(zoomProvider.notifier).state = 100;
                 },
-                child: const CustomMenuButton(
-                  text: "Reset zoom",
+                child: CustomMenuButton(
+                  text: LocalKeys.resetZoom.tr(),
                   shortcut: "Control + 0",
                 ),
               ),
