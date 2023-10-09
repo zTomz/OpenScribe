@@ -231,7 +231,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
   Future<Document> save(Document doc) async {
     String? diskLocation = doc.diskLocation;
 
-    if (!(File(doc.diskLocation!).existsSync())) {
+    if (!(File(doc.diskLocation ?? "").existsSync())) {
       diskLocation = null;
     }
 
