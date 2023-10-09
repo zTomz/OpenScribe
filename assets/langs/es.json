@@ -6,6 +6,7 @@
         "dontSave": "No guardar",
         "quit": "Salir"
     },
+    "unknown": "Desconocido",
     "file": "Archivo",
     "newDocument": "Nuevo documento",
     "open": "Abrir",
@@ -46,5 +47,18 @@
     "english": "Inglés",
     "french": "Francés",
     "spanish": "Español",
-    "italian": "Italiano"
+    "italian": "Italiano",
+    "russian": "Ruso",
+    "portuguese": "Portugués",
+    "ukrainian": "Ucraniano",
+    "chinese": "Chino",
+    "japanese": "Japonés",
+    "korean": "Coreano",
+    "arabic": "Árabe",
+    "turkish": "Turco",
+    "cannotOpenSpecifiedFile": "No se puede abrir el archivo especificado",
+    "fileWithSameTitleAlreadyExists": "Ya existe un archivo con el mismo título",
+    "youHaveToPickALocation": "Debes elegir una ubicación",
+    "fileIsNotAJsonFile": "El archivo no es un archivo JSON",
+    "fileDoesNotExist": "El archivo no existe"
 }

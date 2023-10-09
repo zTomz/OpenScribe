@@ -66,6 +66,19 @@ class LocalKeys {
   static const String french = "french";
   static const String spanish = "spanish";
   static const String italian = "italian";
+  static const String russian = "russian";
+  static const String portuguese = "portuguese";
+  static const String ukrainian = "ukrainian";
+  static const String chinese = "chinese";
+  static const String japanese = "japanese";
+  static const String korean = "korean";
+  static const String arabic = "arabic";
+  static const String turkish = "turkish";
+  static const String cannotOpenSpecifiedFile = "cannotOpenSpecifiedFile";
+  static const String fileWithSameTitleAlreadyExists = "fileWithSameTitleAlreadyExists";
+  static const String youHaveToPickALocation = "youHaveToPickALocation";
+  static const String fileIsNotAJsonFile = "fileIsNotAJsonFile";
+  static const String fileDoesNotExist = "fileDoesNotExist";
 }
 
 Map<String, Locale> languageKeys = const {
@@ -74,4 +87,12 @@ Map<String, Locale> languageKeys = const {
   LocalKeys.french: Locale("fr"),
   LocalKeys.spanish: Locale("es"),
   LocalKeys.italian: Locale("it"),
+  LocalKeys.russian: Locale("ru"),
+  LocalKeys.portuguese: Locale("pt"),
+  LocalKeys.ukrainian: Locale("uk"),
+  LocalKeys.chinese: Locale("zh"),
+  LocalKeys.japanese: Locale("ja"),
+  LocalKeys.korean: Locale("ko"),
+  LocalKeys.arabic: Locale("ar"),
+  LocalKeys.turkish: Locale("tr"),
 };

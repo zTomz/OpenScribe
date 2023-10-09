@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:openscribe/constants.dart';
 import 'package:openscribe/models/document.dart';
 import 'package:openscribe/utils/provider.dart';
 
@@ -49,7 +51,7 @@ class DocumentTab extends ConsumerWidget {
             children: [
               Expanded(
                 child: Text(
-                  (document.title ?? "Unknown")
+                  (document.title ?? LocalKeys.unknown.tr())
                       .replaceAll(
                         ".edoc",
                         "",
@@ -70,10 +72,10 @@ class DocumentTab extends ConsumerWidget {
                   // Remove document
                   if (documents.length <= 1) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         behavior: SnackBarBehavior.floating,
                         content: Text(
-                          "This is the last document.",
+                          LocalKeys.thisIsTheLastDocument.tr(),
                         ),
                       ),
                     );
@@ -95,19 +97,19 @@ class DocumentTab extends ConsumerWidget {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text(
-                          "Are you sure?",
+                        title: Text(
+                          "${LocalKeys.warning.tr()}?",
                         ),
-                        content: const Text(
-                          "Do you want to delete this document?",
+                        content: Text(
+                          "${LocalKeys.doYouWantToDeleteThisDocument.tr()}?",
                         ),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: const Text(
-                              "Cancel",
+                            child: Text(
+                              LocalKeys.cancel.tr(),
                             ),
                           ),
                           TextButton(
@@ -117,8 +119,8 @@ class DocumentTab extends ConsumerWidget {
                                   );
                               Navigator.of(context).pop();
                             },
-                            child: const Text(
-                              "Delete",
+                            child: Text(
+                              LocalKeys.delete.tr(),
                             ),
                           ),
                           TextButton(
@@ -129,8 +131,8 @@ class DocumentTab extends ConsumerWidget {
 
                               Navigator.pop(context);
                             },
-                            child: const Text(
-                              "Save",
+                            child: Text(
+                              LocalKeys.save.tr(),
                             ),
                           ),
                         ],

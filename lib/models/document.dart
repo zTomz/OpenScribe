@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -92,7 +93,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
 
   Future<Document> openDocument() async {
     final result = await FilePicker.platform.pickFiles(
-      dialogTitle: "Open document",
+      dialogTitle: LocalKeys.open.tr(),
       type: FileType.custom,
       allowedExtensions: ["edoc", "txt"],
     );
@@ -100,7 +101,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     if (result == null ||
         result.files.isEmpty ||
         result.files.single.path == null) {
-      throw "Cannot open the specified file.";
+      throw "${LocalKeys.cannotOpenSpecifiedFile.tr()}.";
     }
 
     Document newDoc = Document(
@@ -126,11 +127,11 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     final file = File(path);
 
     if (!(await file.exists())) {
-      throw "File does not exist.";
+      throw "${LocalKeys.fileDoesNotExist.tr()}.";
     }
 
     if (path.split(".").last != "json") {
-      throw "File is not a json file.";
+      throw "${LocalKeys.fileIsNotAJsonFile.tr()}.";
     }
 
     final Map<String, dynamic> data = jsonDecode(await file.readAsString());
@@ -140,7 +141,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     }
 
     Document newDoc = Document(
-      title: data["title"] == "Unknown" ? null : data["title"],
+      title: data["title"] == LocalKeys.unknown.tr() ? null : data["title"],
       text: data["text"],
       diskLocation:
           data["diskLocation"] == "null" ? null : data["diskLocation"],
@@ -183,7 +184,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
       String newPath = newPathList.join("\\");
 
       if (File("$newPath\\$newTitle.edoc").existsSync()) {
-        throw "File with same title already exists.";
+        throw LocalKeys.fileWithSameTitleAlreadyExists.tr();
       }
 
       File(doc.diskLocation!).renameSync("$newPath\\$newTitle.edoc");
@@ -236,8 +237,8 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
 
     if (diskLocation == null) {
       final result = await FilePicker.platform.saveFile(
-        dialogTitle: "Save file",
-        fileName: "${doc.title ?? "Unknown"}.edoc",
+        dialogTitle: LocalKeys.saveAs.tr(),
+        fileName: "${doc.title ?? LocalKeys.unknown.tr()}.edoc",
         type: FileType.custom,
         allowedExtensions: ["edoc", "txt"],
       );
@@ -245,7 +246,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
       if (result != null) {
         diskLocation = result;
       } else {
-        throw "You have to pick a location.";
+        throw "${LocalKeys.youHaveToPickALocation.tr()}.";
       }
     }
 
@@ -259,7 +260,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
 
     // Update the state, remove the old document and add the updatet one
     final updatetDoc = doc.copyWith(
-      title: doc.title ?? "Unknown",
+      title: doc.title ?? LocalKeys.unknown.tr(),
       diskLocation: diskLocation,
       lastSaved: DateTime.now(),
     );
@@ -277,8 +278,8 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     String? diskLocation;
 
     final result = await FilePicker.platform.saveFile(
-      dialogTitle: "Save file",
-      fileName: "${doc.title ?? "Unknown"}.edoc",
+      dialogTitle: LocalKeys.saveAs.tr(),
+      fileName: "${doc.title ?? LocalKeys.unknown.tr()}.edoc",
       type: FileType.custom,
       allowedExtensions: ["edoc", "txt"],
     );
@@ -286,7 +287,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     if (result != null) {
       diskLocation = result;
     } else {
-      throw "You have to pick a location.";
+      throw "${LocalKeys.youHaveToPickALocation.tr()}.";
     }
 
     final file = File(diskLocation);
@@ -299,7 +300,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
 
     // Update the state, remove the old document and add the updatet one
     final updatetDoc = doc.copyWith(
-      title: doc.title ?? "Unknown",
+      title: doc.title ?? LocalKeys.unknown.tr(),
       diskLocation: diskLocation,
       lastSaved: DateTime.now(),
     );
@@ -333,7 +334,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     }
 
     final dataToWrite = {
-      '"title"': '"${document.title ?? "Unknown"}"',
+      '"title"': '"${document.title ?? LocalKeys.unknown.tr()}"',
       '"text"': '"${document.text}"',
       '"diskLocation"':
           '"${(document.diskLocation ?? "null").replaceAll("\\", "\\\\")}"',

@@ -47,5 +47,18 @@
     "english": "Englisch",
     "french": "Französisch",
     "spanish": "Spanisch",
-    "italian": "Italienisch"
+    "italian": "Italienisch",
+    "russian": "Russisch",
+    "portuguese": "Portugiesisch",
+    "ukrainian": "Ukrainisch",
+    "chinese": "Chinesisch",
+    "japanese": "Japanisch",
+    "korean": "Koreanisch",
+    "arabic": "Arabisch",
+    "turkish": "Türkisch",
+    "cannotOpenSpecifiedFile": "Kann nicht die angegebene Datei öffnen",
+    "fileWithSameTitleAlreadyExists": "Eine Datei mit dem gleichen Titel existiert bereits",
+    "youHaveToPickALocation": "Du musst eine Speicherort auswählen",
+    "fileIsNotAJsonFile": "Datei ist kein JSON-Datei",
+    "fileDoesNotExist": "Datei existiert nicht"
 }
