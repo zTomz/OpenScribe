@@ -7,8 +7,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:openscribe/constants.dart';
+import 'package:openscribe/utils/provider.dart';
 import 'package:uuid/uuid.dart';
 
 @immutable
@@ -367,6 +367,78 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     );
 
     await cacheDocumentsDirectory.delete(recursive: true);
+  }
+
+  Future<void> removeDocumentWithDialog(Document selectedDocument,
+      Document currentDocument, BuildContext context, WidgetRef ref) async {
+    // Remove document
+    if (state.length <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            LocalKeys.thisIsTheLastDocument.tr(),
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (selectedDocument.isEmpty) {
+      remove(selectedDocument.uuid);
+
+      if (currentDocument.uuid == selectedDocument.uuid) {
+        ref.read(currentDocumentProvider.notifier).state = getFirstDocument();
+      }
+    } else {
+      // Show dialog if user want to save or delete document
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            "${LocalKeys.warning.tr()}?",
+          ),
+          content: Text(
+            "${LocalKeys.doYouWantToDeleteThisDocument.tr()}?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                LocalKeys.cancel.tr(),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                remove(selectedDocument.uuid);
+
+                if (currentDocument.uuid == selectedDocument.uuid) {
+                  ref.read(currentDocumentProvider.notifier).state =
+                      getFirstDocument();
+                }
+
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                LocalKeys.delete.tr(),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                save(selectedDocument);
+
+                Navigator.pop(context);
+              },
+              child: Text(
+                LocalKeys.save.tr(),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   Document getFirstDocument() {

@@ -3,11 +3,14 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:openscribe/constants.dart';
 import 'package:openscribe/models/document.dart';
 import 'package:openscribe/pages/document_editing_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:openscribe/pages/settings_page.dart';
 import 'package:openscribe/utils/font.dart';
 import 'package:openscribe/utils/provider.dart';
 import 'package:openscribe/utils/settings.dart';
@@ -16,7 +19,7 @@ import 'package:openscribe/widgets/window_button_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
-class DocumentPageOverlayScreen extends ConsumerStatefulWidget {
+class DocumentPageOverlayScreen extends StatefulHookConsumerWidget {
   const DocumentPageOverlayScreen({super.key});
 
   @override
@@ -45,6 +48,9 @@ class _DocumentPageOverlayScreenState
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    final zoom = ref.watch(zoomProvider);
+    final documentIndex = useState(0);
+
     List<Document> documents = ref.watch(documentProvider);
     final windowSize = MediaQuery.of(context).size;
     final double tabSize = min(
@@ -55,61 +61,176 @@ class _DocumentPageOverlayScreenState
       ),
     );
 
-    return Scaffold(
-      backgroundColor: colorScheme.background,
-      body: Column(
-        children: [
-          SizedBox(
-            height: windowTitleBarHeight,
-            child: Row(
-              children: [
-                const SizedBox(width: 10),
-                SizedBox(
-                  width: 25,
-                  height: 25,
-                  child: Image.asset("assets/icons/app_icon.ico"),
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyN): () {
+          // Create a new document and asign it to currentDocumentProvider
+          ref.read(currentDocumentProvider.notifier).state =
+              ref.read(documentProvider.notifier).createNew();
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyO):
+            () async {
+          try {
+            ref.read(currentDocumentProvider.notifier).state =
+                await ref.read(documentProvider.notifier).openDocument();
+          } catch (error) {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).clearSnackBars();
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  error.toString(),
                 ),
-                SizedBox(
-                  width: min(
-                    windowSize.width * 0.7,
-                    documents.length * (tabSize + 10),
+              ),
+            );
+          }
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyS):
+            () async {
+          try {
+            ref.read(currentDocumentProvider.notifier).state =
+                await ref.read(documentProvider.notifier).save(
+                      ref.read(currentDocumentProvider.notifier).state,
+                    );
+          } catch (error) {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).clearSnackBars();
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  error.toString(),
+                ),
+              ),
+            );
+          }
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.shift,
+            LogicalKeyboardKey.keyS): () async {
+          try {
+            ref.read(currentDocumentProvider.notifier).state = await ref
+                .read(documentProvider.notifier)
+                .saveAs(ref.read(currentDocumentProvider.notifier).state);
+          } catch (error) {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).clearSnackBars();
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  error.toString(),
+                ),
+              ),
+            );
+          }
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.equal):
+            () {
+          ref.read(zoomProvider.notifier).state += 5;
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.minus):
+            () {
+          if (zoom >= 10) {
+            ref.read(zoomProvider.notifier).state -= 5;
+          }
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit0):
+            () {
+          ref.read(zoomProvider.notifier).state = 100;
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.tab): () {
+          if (documentIndex.value >=
+              ref.read(documentProvider.notifier).getDocuments().length) {
+            documentIndex.value = 0;
+          }
+
+          ref.read(currentDocumentProvider.notifier).state = ref
+              .read(documentProvider.notifier)
+              .getDocuments()[documentIndex.value];
+          documentIndex.value += 1;
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.delete):
+            () {
+          final currentDocument = ref.read(currentDocumentProvider);
+          ref.read(documentProvider.notifier).removeDocumentWithDialog(
+                currentDocument,
+                currentDocument,
+                context,
+                ref,
+              );
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyQ): () {
+          onWindowClose();
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.comma):
+            () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const SettingsPage(),
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: colorScheme.background,
+        body: Column(
+          children: [
+            SizedBox(
+              height: windowTitleBarHeight,
+              child: Row(
+                children: [
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 25,
+                    height: 25,
+                    child: Image.asset("assets/icons/app_icon.ico"),
                   ),
-                  child: ScrollConfiguration(
-                    behavior: ScrollConfiguration.of(context).copyWith(
-                      dragDevices: {
-                        PointerDeviceKind.touch,
-                        PointerDeviceKind.mouse,
-                        PointerDeviceKind.invertedStylus,
-                        PointerDeviceKind.stylus,
-                        PointerDeviceKind.unknown,
-                        PointerDeviceKind.trackpad,
-                      },
+                  SizedBox(
+                    width: min(
+                      windowSize.width * 0.7,
+                      documents.length * (tabSize + 10),
                     ),
-                    child: ListView.builder(
-                      itemCount: documents.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) => DocumentTab(
-                        document: documents[index],
-                        documents: documents,
-                        tabSize: tabSize,
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context).copyWith(
+                        dragDevices: {
+                          PointerDeviceKind.touch,
+                          PointerDeviceKind.mouse,
+                          PointerDeviceKind.invertedStylus,
+                          PointerDeviceKind.stylus,
+                          PointerDeviceKind.unknown,
+                          PointerDeviceKind.trackpad,
+                        },
+                      ),
+                      child: ListView.builder(
+                        itemCount: documents.length,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) => DocumentTab(
+                          document: documents[index],
+                          documents: documents,
+                          tabSize: tabSize,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: WindowCaption(
-                    backgroundColor: colorScheme.background,
-                    brightness: colorScheme.brightness,
+                  Expanded(
+                    child: WindowCaption(
+                      backgroundColor: colorScheme.background,
+                      brightness: colorScheme.brightness,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const WindowButtonBar(),
-          const Expanded(
-            child: DocumentEditingPage(),
-          ),
-        ],
+            const WindowButtonBar(),
+            const Expanded(
+              child: DocumentEditingPage(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -120,8 +241,6 @@ class _DocumentPageOverlayScreenState
         .load(); // If it is already loaded, it doesnt load again
 
     final settings = ref.read(settingsProvider.notifier).getSettings;
-
-    print(settings);
 
     if (settings.font == null || settings.font == "Default") {
       return;

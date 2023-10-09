@@ -69,82 +69,8 @@ class DocumentTab extends ConsumerWidget {
               ),
               InkWell(
                 onTap: () {
-                  // Remove document
-                  if (documents.length <= 1) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        behavior: SnackBarBehavior.floating,
-                        content: Text(
-                          LocalKeys.thisIsTheLastDocument.tr(),
-                        ),
-                      ),
-                    );
-                    return;
-                  }
-
-                  if (document.isEmpty) {
-                    ref.read(documentProvider.notifier).remove(
-                          document.uuid,
-                        );
-
-                    if (currentDocument.uuid == document.uuid) {
-                      ref.read(currentDocumentProvider.notifier).state = ref
-                          .read(documentProvider.notifier)
-                          .getFirstDocument();
-                    }
-                  } else {
-                    // Show dialog if user want to save or delete document
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(
-                          "${LocalKeys.warning.tr()}?",
-                        ),
-                        content: Text(
-                          "${LocalKeys.doYouWantToDeleteThisDocument.tr()}?",
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text(
-                              LocalKeys.cancel.tr(),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              ref.read(documentProvider.notifier).remove(
-                                    document.uuid,
-                                  );
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(
-                              LocalKeys.delete.tr(),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              ref.read(documentProvider.notifier).save(
-                                    document,
-                                  );
-
-                              Navigator.pop(context);
-                            },
-                            child: Text(
-                              LocalKeys.save.tr(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-
-                    if (currentDocument.uuid == document.uuid) {
-                      ref.read(currentDocumentProvider.notifier).state = ref
-                          .read(documentProvider.notifier)
-                          .getFirstDocument();
-                    }
-                  }
+                  ref.read(documentProvider.notifier).removeDocumentWithDialog(
+                      document, currentDocument, context, ref);
                 },
                 hoverColor: Colors.grey.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(180),

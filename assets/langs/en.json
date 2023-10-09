@@ -6,6 +6,7 @@
         "dontSave": "Don't save",
         "quit": "Quit"
     },
+    "unknown": "Unknown",
     "file": "File",
     "newDocument": "New document",
     "open": "Open",
