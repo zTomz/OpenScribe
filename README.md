@@ -6,13 +6,13 @@ OpenScribe is an open source editor app that aims to replace the standard Window
 ![OpenScribe](assets/App/settings.png)
 
 ### Features
-- Tabbed Editing: Open multiple notes in tabs to switch between them efficiently.
-- Customizable User Experience: A custom window, custom colors, light and dark mode, and multiple fonts for a unique user experience.
-- Shortcuts: OpenScribe has a built-in keyboard shortcut to get work done.
-- Ease of Use: The app is intuitive and easy to use, so you can focus on writing.
-- Multiple Languages: OpenScribe is translated into multiple languages.
-- Fast: OpenScribe has a fast startup time and is lightweight.
-- Open Source: OpenScribe is an open source project. You can view the source code and contribute to improve the app.
+- Tabbed Editing 🚀: Open multiple notes in tabs to switch between them efficiently.
+- Customizable User Experience 🎨: A custom window, custom colors, light and dark mode, and multiple fonts for a unique user experience.
+- Shortcuts ⌨️: OpenScribe has a built-in keyboard shortcut to get work done.
+- Ease of Use 🌟: The app is intuitive and easy to use, so you can focus on writing.
+- Multiple Languages 🌍: OpenScribe is translated into multiple languages.
+- Fast 🏃‍♂️: OpenScribe has a fast startup time and is lightweight.
+- Open Source 📜: OpenScribe is an open source project. You can view the source code and contribute to improve the app.
 
 ### Installation
 Go to the releases and install the latest release. Unzip the .zip file and run `openscribe.exe`.
