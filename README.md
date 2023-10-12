@@ -2,8 +2,13 @@
 
 OpenScribe is an open source editor app that aims to replace the standard Windows editor with advanced features.
 
+<<<<<<< HEAD
 ![OpenScribe](assets/app/home.png)
 ![OpenScribe](assets/app/settings.png)
+=======
+![OpenScribe](assets/App/image.png)
+![OpenScribe](assets/App/settings.png)
+>>>>>>> d5ccd2dbb8990f51aa247c8ebac1904751240b21
 
 ### Features
 - Tabbed Editing 🚀: Open multiple notes in tabs to switch between them efficiently.
