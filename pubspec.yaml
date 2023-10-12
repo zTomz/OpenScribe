@@ -32,19 +32,6 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^2.0.0
-  msix: ^3.16.4
-
-msix_config:
-  display_name: OpenScribe
-  publisher_display_name: Tom
-  identity_name: com.tom.openscribe
-  msix_version: 1.0.0.0
-  logo_path: assets/app/logo.png
-  trim_logo: false
-  icons_background_color: "#2D2E37"
-  certificate_path: assets/app/certificates/openscribe.pfx
-  certificate_password: "#openscribe#"
-  languages: en-us, de-de, es-es, fr-fr, it-it, ar-ar, ru-ru, ja-jp, ko-kr, pt-br, zh-cn, uk-ua, tr-tr
 
 flutter:
   uses-material-design: true

@@ -53,7 +53,7 @@ class DocumentTab extends ConsumerWidget {
                 child: Text(
                   (document.title ?? LocalKeys.unknown.tr())
                       .replaceAll(
-                        ".edoc",
+                        ".odoc",
                         "",
                       )
                       .replaceAll(

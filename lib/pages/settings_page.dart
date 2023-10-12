@@ -225,6 +225,9 @@ class SettingsPage extends HookConsumerWidget {
                               value: languageKeys[lang],
                               child: Text(
                                 lang.tr(),
+                                style: TextStyle(
+                                  color: colorScheme.onBackground,
+                                ),
                               ),
                             ),
                           )
@@ -314,7 +317,12 @@ class SettingsWindowBar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          Text(LocalKeys.settings.tr()),
+          Text(
+            LocalKeys.settings.tr(),
+            style: TextStyle(
+              color: colorScheme.onBackground,
+            ),
+          ),
           Expanded(
             child: WindowCaption(
               backgroundColor: colorScheme.background,

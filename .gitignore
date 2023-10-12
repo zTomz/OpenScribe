@@ -43,5 +43,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Packaging keys
-/assets/app/certificates/
+# The installer file, because it is provided in the releases
+/assets/app/installer/openscribe_setup.exe

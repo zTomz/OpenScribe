@@ -23,7 +23,7 @@ class DocumentEditingPage extends HookConsumerWidget {
     if (document.title != titleController.text) {
       titleController.text = (document.title ?? LocalKeys.unknown.tr())
           .replaceAll(
-            ".edoc",
+            ".odoc",
             "",
           )
           .replaceAll(
@@ -109,6 +109,7 @@ ${LocalKeys.lastModified.tr()}: ${document.formatDateTime(document.lastModified)
                 style: TextStyle(
                   fontSize:
                       16 * (zoom / 100), // The zoom only controls the font size
+                  color: colorScheme.onBackground,
                 ),
                 decoration: InputDecoration(
                   border: InputBorder.none,

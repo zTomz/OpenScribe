@@ -95,7 +95,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     final result = await FilePicker.platform.pickFiles(
       dialogTitle: LocalKeys.open.tr(),
       type: FileType.custom,
-      allowedExtensions: ["edoc", "txt"],
+      allowedExtensions: ["odoc", "txt"],
     );
 
     if (result == null ||
@@ -183,15 +183,15 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
       newPathList.removeLast();
       String newPath = newPathList.join("\\");
 
-      if (File("$newPath\\$newTitle.edoc").existsSync()) {
+      if (File("$newPath\\$newTitle.odoc").existsSync()) {
         throw LocalKeys.fileWithSameTitleAlreadyExists.tr();
       }
 
-      File(doc.diskLocation!).renameSync("$newPath\\$newTitle.edoc");
+      File(doc.diskLocation!).renameSync("$newPath\\$newTitle.odoc");
 
       doc = doc.copyWith(
         title: newTitle,
-        diskLocation: "$newPath\\$newTitle.edoc",
+        diskLocation: "$newPath\\$newTitle.odoc",
       );
       // Update the state, remove the old document and add the updatet one
       state = [
@@ -238,9 +238,9 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     if (diskLocation == null) {
       final result = await FilePicker.platform.saveFile(
         dialogTitle: LocalKeys.saveAs.tr(),
-        fileName: "${doc.title ?? LocalKeys.unknown.tr()}.edoc",
+        fileName: "${doc.title ?? LocalKeys.unknown.tr()}.odoc",
         type: FileType.custom,
-        allowedExtensions: ["edoc", "txt"],
+        allowedExtensions: ["odoc", "txt"],
       );
 
       if (result != null) {
@@ -279,9 +279,9 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
 
     final result = await FilePicker.platform.saveFile(
       dialogTitle: LocalKeys.saveAs.tr(),
-      fileName: "${doc.title ?? LocalKeys.unknown.tr()}.edoc",
+      fileName: "${doc.title ?? LocalKeys.unknown.tr()}.odoc",
       type: FileType.custom,
-      allowedExtensions: ["edoc", "txt"],
+      allowedExtensions: ["odoc", "txt"],
     );
 
     if (result != null) {
@@ -325,7 +325,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
 
   Future<void> saveToDocumentsCache(Document document) async {
     final path =
-        "${MemoryLocations.applicationDocumentsDirectory}\\${MemoryLocations.documentsCacheLocation}\\${document.uuid}.json"; // Important: JSON Document, not .edoc, the name of doc is the uuid and the title + text is stored in the document
+        "${MemoryLocations.applicationDocumentsDirectory}\\${MemoryLocations.documentsCacheLocation}\\${document.uuid}.json"; // Important: JSON Document, not .odoc, the name of doc is the uuid and the title + text is stored in the document
     final file = File(path);
 
     // Almost impossible, but just in case

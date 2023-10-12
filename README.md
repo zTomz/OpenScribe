@@ -2,7 +2,7 @@
 
 OpenScribe is an open source editor app that aims to replace the standard Windows editor with advanced features.
 
-![OpenScribe](assets/app/image.png)
+![OpenScribe](assets/app/home.png)
 ![OpenScribe](assets/app/settings.png)
 
 ### Features
@@ -26,6 +26,9 @@ Go to the releases and install the latest release. Unzip the .zip file and run `
 - Open settings with `Ctrl + ,` or click on the top right settings icon
 - Get information about the with the info icon on the top right under the settings icon, hover over it to get the information
 - Quit the app with `Ctrl + Q`
+
+- #### Note
+    - When changing to light mode, probably you have to adjust the primary color setting
 
 ### License
 This project is licensed under the MIT license. See the license file for more information.
