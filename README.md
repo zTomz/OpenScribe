@@ -25,6 +25,7 @@ Go to the releases and install the latest release. Unzip the .zip file and run `
 - Zoom in with `Ctrl + Plus`, zoom out with `Ctrl + Minus`, reset with `Ctrl + 0` or go to `View -> ...`
 - Open settings with `Ctrl + ,` or click on the top right settings icon
 - Get information about the with the info icon on the top right under the settings icon, hover over it to get the information
+- Print the document with `Ctrl + P` or go to `View -> Print`
 - Quit the app with `Ctrl + Q`
 
 - #### Note
