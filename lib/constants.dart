@@ -79,6 +79,8 @@ class LocalKeys {
   static const String youHaveToPickALocation = "youHaveToPickALocation";
   static const String fileIsNotAJsonFile = "fileIsNotAJsonFile";
   static const String fileDoesNotExist = "fileDoesNotExist";
+  static const String printing = "printing";
+  static const String documentIsEmpty = "documentIsEmpty";
 }
 
 Map<String, Locale> languageKeys = const {

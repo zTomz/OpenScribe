@@ -60,5 +60,7 @@
     "fileWithSameTitleAlreadyExists": "Un fichier avec le même titre existe déjà",
     "youHaveToPickALocation": "Vous devez choisir un emplacement",
     "fileIsNotAJsonFile": "Le fichier n'est pas un fichier JSON",
-    "fileDoesNotExist": "Le fichier n'existe pas"
+    "fileDoesNotExist": "Le fichier n'existe pas",
+    "printing": "Imprimer",
+    "documentIsEmpty": "Ce document est vide"
 }

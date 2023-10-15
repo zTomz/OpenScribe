@@ -377,7 +377,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
         SnackBar(
           behavior: SnackBarBehavior.floating,
           content: Text(
-            LocalKeys.thisIsTheLastDocument.tr(),
+            "${LocalKeys.thisIsTheLastDocument.tr()}.",
           ),
         ),
       );

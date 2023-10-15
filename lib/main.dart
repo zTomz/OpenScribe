@@ -66,6 +66,7 @@ void main() async {
           Locale("tr"),
         ],
         path: 'assets/langs',
+        fallbackLocale: const Locale("en"),
         child: MyApp(
           savedThemeMode: savedThemeMode,
           primaryColor: primaryColor,

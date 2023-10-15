@@ -59,5 +59,7 @@
     "fileWithSameTitleAlreadyExists": "ملف بنفس العنوان موجود بالفعل",
     "youHaveToPickALocation": "يجب عليك اختيار موقع",
     "fileIsNotAJsonFile": "الملف ليس ملف JSON",
-    "fileDoesNotExist": "الملف غير موجود"
+    "fileDoesNotExist": "الملف غير موجود",
+    "printing": "طباعة",
+    "documentIsEmpty": "هذا المستند فارغ"
 }

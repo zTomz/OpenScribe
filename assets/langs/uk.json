@@ -60,5 +60,7 @@
     "fileWithSameTitleAlreadyExists": "Файл з такою ж назвою вже існує",
     "youHaveToPickALocation": "Вам потрібно вибрати місце розташування",
     "fileIsNotAJsonFile": "Файл не є файлом JSON",
-    "fileDoesNotExist": "Файл не існує"
+    "fileDoesNotExist": "Файл не існує",
+    "printing": "друкувати",
+    "documentIsEmpty": "Цей документ порожній"
 }

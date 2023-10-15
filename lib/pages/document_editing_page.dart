@@ -31,6 +31,7 @@ class DocumentEditingPage extends HookConsumerWidget {
             "",
           );
     }
+
     if (document.text != textController.text) {
       textController.text = document.text;
     }

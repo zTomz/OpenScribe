@@ -14,6 +14,7 @@ import 'package:openscribe/pages/settings_page.dart';
 import 'package:openscribe/utils/font.dart';
 import 'package:openscribe/utils/provider.dart';
 import 'package:openscribe/utils/settings.dart';
+import 'package:openscribe/utils/utils.dart';
 import 'package:openscribe/widgets/documents_tab.dart';
 import 'package:openscribe/widgets/window_button_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -172,6 +173,15 @@ class _DocumentPageOverlayScreenState
             MaterialPageRoute(
               builder: (context) => const SettingsPage(),
             ),
+          );
+        },
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyP):
+            () async {
+          final currentDocument = ref.read(currentDocumentProvider);
+          await Utils.displayPrintingDialog(
+            currentDocument.title,
+            currentDocument.text,
+            context,
           );
         }
       },

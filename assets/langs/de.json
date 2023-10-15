@@ -16,7 +16,7 @@
     "zoomOut": "Verkleinern",
     "resetZoom": "Zoom zurücksetzen",
     "unknown": "Unbekannt",
-    "thisIsTheLastDocument": "Dies ist das Letzte Dokument",
+    "thisIsTheLastDocument": "Dies ist das letzte Dokument",
     "areYouSure": "Sind Sie sicher?",
     "doYouWantToDeleteThisDocument": "Möchten Sie dieses Dokument löschen?",
     "cancel": "Abbrechen",
@@ -60,5 +60,7 @@
     "fileWithSameTitleAlreadyExists": "Eine Datei mit dem gleichen Titel existiert bereits",
     "youHaveToPickALocation": "Du musst eine Speicherort auswählen",
     "fileIsNotAJsonFile": "Datei ist kein JSON-Datei",
-    "fileDoesNotExist": "Datei existiert nicht"
+    "fileDoesNotExist": "Datei existiert nicht",
+    "printing": "Drucken",
+    "documentIsEmpty": "Dieses Dokument ist leer"
 }

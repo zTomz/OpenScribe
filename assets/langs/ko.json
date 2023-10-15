@@ -60,6 +60,8 @@
     "fileWithSameTitleAlreadyExists": "같은 제목의 파일이 이미 존재합니다",
     "youHaveToPickALocation": "위치를 선택해야 합니다",
     "fileIsNotAJsonFile": "파일은 JSON 파일이 아닙니다",
-    "fileDoesNotExist": "파일이 존재하지 않습니다"
+    "fileDoesNotExist": "파일이 존재하지 않습니다",
+    "printing": "인쇄",
+    "documentIsEmpty": "이 문서는 비어 있습니다"
 }
 

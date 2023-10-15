@@ -60,5 +60,7 @@
     "fileWithSameTitleAlreadyExists": "Aynı başlığa sahip bir dosya zaten mevcut",
     "youHaveToPickALocation": "Bir konum seçmelisiniz",
     "fileIsNotAJsonFile": "Dosya bir JSON dosyası değil",
-    "fileDoesNotExist": "Dosya mevcut değil"
+    "fileDoesNotExist": "Dosya mevcut değil",
+    "printing": "Yazdırmak",
+    "documentIsEmpty": "Bu belge boş"
 }

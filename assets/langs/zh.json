@@ -60,5 +60,7 @@
     "fileWithSameTitleAlreadyExists": "具有相同标题的文件已经存在",
     "youHaveToPickALocation": "您必须选择一个位置",
     "fileIsNotAJsonFile": "文件不是JSON文件",
-    "fileDoesNotExist": "文件不存在"
+    "fileDoesNotExist": "文件不存在",
+    "printing": "列印",
+    "documentIsEmpty": "这个文档是空的"
 }

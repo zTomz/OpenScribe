@@ -4,7 +4,10 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   flutter_acrylic
+  printing
   screen_retriever
+  syncfusion_pdfviewer_windows
+  url_launcher_windows
   window_manager
 )
 

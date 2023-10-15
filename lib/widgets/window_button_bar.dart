@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openscribe/constants.dart';
 import 'package:openscribe/pages/settings_page.dart';
+import 'package:openscribe/utils/utils.dart';
 import 'package:openscribe/utils/provider.dart';
 
 class WindowButtonBar extends HookConsumerWidget {
@@ -131,6 +132,20 @@ class WindowButtonBar extends HookConsumerWidget {
                 child: CustomMenuButton(
                   text: LocalKeys.saveAs.tr(),
                   shortcut: "Control + Shift + S",
+                ),
+              ),
+              MenuItemButton(
+                onPressed: () async {
+                  final currentDocument = ref.read(currentDocumentProvider);
+                  await Utils.displayPrintingDialog(
+                    currentDocument.title,
+                    currentDocument.text,
+                    context,
+                  );
+                },
+                child: CustomMenuButton(
+                  text: LocalKeys.printing.tr(),
+                  shortcut: "Control + P",
                 ),
               ),
             ],
