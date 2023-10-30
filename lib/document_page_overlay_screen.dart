@@ -187,59 +187,87 @@ class _DocumentPageOverlayScreenState
       },
       child: Scaffold(
         backgroundColor: colorScheme.background,
-        body: Column(
-          children: [
-            SizedBox(
-              height: windowTitleBarHeight,
-              child: Row(
-                children: [
-                  const SizedBox(width: 10),
-                  SizedBox(
-                    width: 25,
-                    height: 25,
-                    child: Image.asset("assets/icons/app_icon.ico"),
-                  ),
-                  SizedBox(
-                    width: min(
-                      windowSize.width * 0.7,
-                      documents.length * (tabSize + 10),
+        body: SafeArea(
+          child: Column(
+            children: [
+              SizedBox(
+                height: windowTitleBarHeight,
+                child: Row(
+                  children: [
+                    const SizedBox(width: 10),
+                    SizedBox(
+                      width: 25,
+                      height: 25,
+                      child: Image.asset("assets/icons/app_icon.ico"),
                     ),
-                    child: ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(context).copyWith(
-                        dragDevices: {
-                          PointerDeviceKind.touch,
-                          PointerDeviceKind.mouse,
-                          PointerDeviceKind.invertedStylus,
-                          PointerDeviceKind.stylus,
-                          PointerDeviceKind.unknown,
-                          PointerDeviceKind.trackpad,
-                        },
-                      ),
-                      child: ListView.builder(
-                        itemCount: documents.length,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) => DocumentTab(
-                          document: documents[index],
-                          documents: documents,
-                          tabSize: tabSize,
+                    if (Utils.isDesktop)
+                      SizedBox(
+                        width: min(
+                          windowSize.width * 0.7,
+                          documents.length * (tabSize + 10),
+                        ),
+                        child: ScrollConfiguration(
+                          behavior: ScrollConfiguration.of(context).copyWith(
+                            dragDevices: {
+                              PointerDeviceKind.touch,
+                              PointerDeviceKind.mouse,
+                              PointerDeviceKind.invertedStylus,
+                              PointerDeviceKind.stylus,
+                              PointerDeviceKind.unknown,
+                              PointerDeviceKind.trackpad,
+                            },
+                          ),
+                          child: ListView.builder(
+                            itemCount: documents.length,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) => DocumentTab(
+                              document: documents[index],
+                              documents: documents,
+                              tabSize: tabSize,
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      Expanded(
+                        child: ScrollConfiguration(
+                          behavior: ScrollConfiguration.of(context).copyWith(
+                            dragDevices: {
+                              PointerDeviceKind.touch,
+                              PointerDeviceKind.mouse,
+                              PointerDeviceKind.invertedStylus,
+                              PointerDeviceKind.stylus,
+                              PointerDeviceKind.unknown,
+                              PointerDeviceKind.trackpad,
+                            },
+                          ),
+                          child: ListView.builder(
+                            itemCount: documents.length,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) => DocumentTab(
+                              document: documents[index],
+                              documents: documents,
+                              tabSize: tabSize,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: WindowCaption(
-                      backgroundColor: colorScheme.background,
-                      brightness: colorScheme.brightness,
-                    ),
-                  ),
-                ],
+                    if (Utils.isDesktop)
+                      Expanded(
+                        child: WindowCaption(
+                          backgroundColor: colorScheme.background,
+                          brightness: colorScheme.brightness,
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            const WindowButtonBar(),
-            const Expanded(
-              child: DocumentEditingPage(),
-            ),
-          ],
+              const WindowButtonBar(),
+              const Expanded(
+                child: DocumentEditingPage(),
+              ),
+            ],
+          ),
         ),
       ),
     );

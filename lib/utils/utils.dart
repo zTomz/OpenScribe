@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -142,4 +143,6 @@ class Utils {
 
     pdfViewerController.dispose();
   }
+
+  static bool get isDesktop => Platform.isWindows || Platform.isLinux || Platform.isMacOS;
 }

@@ -20,7 +20,6 @@ class DocumentTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-
     final currentDocument = ref.watch(currentDocumentProvider);
 
     return Padding(

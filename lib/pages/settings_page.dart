@@ -8,6 +8,7 @@ import 'package:openscribe/constants.dart';
 import 'package:openscribe/utils/font.dart';
 import 'package:openscribe/utils/provider.dart';
 import 'package:openscribe/utils/settings.dart';
+import 'package:openscribe/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -24,236 +25,241 @@ class SettingsPage extends HookConsumerWidget {
     final settings = ref.watch(settingsProvider);
 
     return Scaffold(
-      body: Column(
-        children: [
-          SettingsWindowBar(
-            onClose: () async {
-              changePrimaryColor(context, primaryColor.value);
-            },
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: ListView(
-                children: [
-                  Text(
-                    LocalKeys.theme.tr(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge!
-                        .copyWith(color: colorScheme.onBackground),
-                  ),
-                  const SizedBox(height: 10),
-                  ListTile(
-                    title: Text(LocalKeys.themeMode.tr()),
-                    trailing: DropdownButton(
+      body: SafeArea(
+        child: Column(
+          children: [
+            SettingsWindowBar(
+              onClose: () async {
+                changePrimaryColor(context, primaryColor.value);
+              },
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: ListView(
+                  children: [
+                    Text(
+                      LocalKeys.theme.tr(),
                       style: Theme.of(context)
                           .textTheme
-                          .bodyLarge!
+                          .titleLarge!
                           .copyWith(color: colorScheme.onBackground),
-                      value: AdaptiveTheme.of(context).mode,
-                      items: [
-                        DropdownMenuItem(
-                          value: AdaptiveThemeMode.light,
-                          child: Text(LocalKeys.light.tr()),
-                        ),
-                        DropdownMenuItem(
-                          value: AdaptiveThemeMode.dark,
-                          child: Text(LocalKeys.dark.tr()),
-                        ),
-                        DropdownMenuItem(
-                          value: AdaptiveThemeMode.system,
-                          child: Text("${LocalKeys.system.tr()}   "),
-                        )
-                      ],
-                      onChanged: (value) {
-                        if (value == null) return;
-
-                        AdaptiveTheme.of(context).setThemeMode(value);
-                      },
-                      alignment: Alignment.centerLeft,
-                      borderRadius: BorderRadius.circular(10),
-                      padding: const EdgeInsets.all(10),
-                      underline: const SizedBox.shrink(),
-                      icon: Icon(
-                        AdaptiveTheme.of(context).mode ==
-                                AdaptiveThemeMode.light
-                            ? Icons.light_mode_rounded
-                            : Icons.dark_mode_rounded,
-                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  ListTile(
-                    title: Text(LocalKeys.primaryColor.tr()),
-                    trailing: Tooltip(
-                      message: LocalKeys.toggleColorPicker.tr(),
-                      child: InkWell(
-                        onTap: () {
-                          // Color picker gets closed
-                          if (showColorPicker.value) {
-                            changePrimaryColor(context, primaryColor.value);
-                          }
+                    const SizedBox(height: 10),
+                    ListTile(
+                      title: Text(LocalKeys.themeMode.tr()),
+                      trailing: DropdownButton(
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge!
+                            .copyWith(color: colorScheme.onBackground),
+                        value: AdaptiveTheme.of(context).mode,
+                        items: [
+                          DropdownMenuItem(
+                            value: AdaptiveThemeMode.light,
+                            child: Text(LocalKeys.light.tr()),
+                          ),
+                          DropdownMenuItem(
+                            value: AdaptiveThemeMode.dark,
+                            child: Text(LocalKeys.dark.tr()),
+                          ),
+                          DropdownMenuItem(
+                            value: AdaptiveThemeMode.system,
+                            child: Text("${LocalKeys.system.tr()}   "),
+                          )
+                        ],
+                        onChanged: (value) {
+                          if (value == null) return;
 
-                          showColorPicker.value = !showColorPicker.value;
+                          AdaptiveTheme.of(context).setThemeMode(value);
                         },
+                        alignment: Alignment.centerLeft,
                         borderRadius: BorderRadius.circular(10),
-                        child: Container(
-                          width: 70,
-                          height: 35,
-                          decoration: BoxDecoration(
-                            color: primaryColor.value,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: colorScheme.onBackground,
-                              width: 2,
-                            ),
-                          ),
+                        padding: const EdgeInsets.all(10),
+                        underline: const SizedBox.shrink(),
+                        icon: Icon(
+                          AdaptiveTheme.of(context).mode ==
+                                  AdaptiveThemeMode.light
+                              ? Icons.light_mode_rounded
+                              : Icons.dark_mode_rounded,
                         ),
                       ),
                     ),
-                  ),
-                  if (showColorPicker.value)
-                    PaletteHuePicker(
-                      onChanged: (color) {
-                        primaryColor.value = color.toColor();
-                      },
-                      color: HSVColor.fromColor(
-                        primaryColor.value,
-                      ),
-                      hueBorderRadius: BorderRadius.circular(20),
-                      paletteBorderRadius: BorderRadius.circular(20),
-                    ),
-                  const SizedBox(height: 10),
-                  Text(
-                    LocalKeys.text.tr(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge!
-                        .copyWith(color: colorScheme.onBackground),
-                  ),
-                  ListTile(
-                    title: Text(LocalKeys.font.tr()),
-                    trailing: DropdownButton(
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge!
-                          .copyWith(color: colorScheme.onBackground),
-                      value: settings.font ?? LocalKeys.Default.tr(),
-                      items: fontFamilies.keys.map((key) {
-                        return DropdownMenuItem(
-                          value: key ?? "Default",
-                          child: Text(
-                            key ?? LocalKeys.Default.tr(),
-                            style: fontFamilies[key] ?? const TextStyle(),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (value) async {
-                        if (value == null) return;
+                    const SizedBox(height: 10),
+                    ListTile(
+                      title: Text(LocalKeys.primaryColor.tr()),
+                      trailing: Tooltip(
+                        message: LocalKeys.toggleColorPicker.tr(),
+                        child: InkWell(
+                          onTap: () {
+                            // Color picker gets closed
+                            if (showColorPicker.value) {
+                              changePrimaryColor(context, primaryColor.value);
+                            }
 
-                        await ref
-                            .read(settingsProvider.notifier)
-                            .changeFontFamily(value, context);
-                      },
-                      alignment: Alignment.centerLeft,
-                      borderRadius: BorderRadius.circular(10),
-                      padding: const EdgeInsets.all(10),
-                      underline: const SizedBox.shrink(),
-                      icon: const Icon(Icons.font_download_rounded),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    LocalKeys.storage.tr(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge!
-                        .copyWith(color: colorScheme.onBackground),
-                  ),
-                  ListTile(
-                    title: Text(LocalKeys.whenEditorIsLaunched.tr()),
-                    trailing: DropdownButton<WhenEditorLaunched>(
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge!
-                          .copyWith(color: colorScheme.onBackground),
-                      value: settings.whenEditorLaunched,
-                      items: [
-                        DropdownMenuItem(
-                          value: WhenEditorLaunched.documentsFromOlderSession,
-                          child: Text(
-                            "${LocalKeys.loadFilesFromOlderSession.tr()}   ",
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: WhenEditorLaunched.newSession,
-                          child: Text(
-                            LocalKeys.openANewSession.tr(),
-                          ),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        if (value == null) return;
-
-                        ref
-                            .read(settingsProvider.notifier)
-                            .changeWhenEditorLaunched(value);
-                      },
-                      alignment: Alignment.centerLeft,
-                      borderRadius: BorderRadius.circular(10),
-                      padding: const EdgeInsets.all(10),
-                      underline: const SizedBox.shrink(),
-                      icon: const Icon(Icons.save_rounded),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    LocalKeys.language.tr(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge!
-                        .copyWith(color: colorScheme.onBackground),
-                  ),
-                  ListTile(
-                    title: Text(LocalKeys.language.tr()),
-                    trailing: DropdownButton<Locale>(
-                      value: context.locale,
-                      items: languageKeys.keys
-                          .map(
-                            (lang) => DropdownMenuItem(
-                              value: languageKeys[lang],
-                              child: Text(
-                                lang.tr(),
-                                style: TextStyle(
-                                  color: colorScheme.onBackground,
-                                ),
+                            showColorPicker.value = !showColorPicker.value;
+                          },
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            width: 70,
+                            height: 35,
+                            decoration: BoxDecoration(
+                              color: primaryColor.value,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: colorScheme.onBackground,
+                                width: 2,
                               ),
                             ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value == null) return;
-
-                        context.setLocale(value);
-                      },
-                      alignment: Alignment.centerLeft,
-                      borderRadius: BorderRadius.circular(10),
-                      padding: const EdgeInsets.all(10),
-                      underline: const SizedBox.shrink(),
-                      icon: const Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Icon(
-                          Icons.language_rounded,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    if (showColorPicker.value)
+                      PaletteHuePicker(
+                        onChanged: (color) {
+                          primaryColor.value = color.toColor();
+                        },
+                        color: HSVColor.fromColor(
+                          primaryColor.value,
+                        ),
+                        hueBorderRadius: BorderRadius.circular(20),
+                        paletteBorderRadius: BorderRadius.circular(20),
+                      ),
+                    const SizedBox(height: 10),
+                    Text(
+                      LocalKeys.text.tr(),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge!
+                          .copyWith(color: colorScheme.onBackground),
+                    ),
+                    ListTile(
+                      title: Text(LocalKeys.font.tr()),
+                      trailing: DropdownButton(
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge!
+                            .copyWith(color: colorScheme.onBackground),
+                        value: settings.font ?? LocalKeys.Default.tr(),
+                        items: fontFamilies.keys.map((key) {
+                          return DropdownMenuItem(
+                            value: key ?? "Default",
+                            child: Text(
+                              key ?? LocalKeys.Default.tr(),
+                              style: fontFamilies[key] ?? const TextStyle(),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) async {
+                          if (value == null) return;
+
+                          await ref
+                              .read(settingsProvider.notifier)
+                              .changeFontFamily(value, context);
+                        },
+                        alignment: Alignment.centerLeft,
+                        borderRadius: BorderRadius.circular(10),
+                        padding: const EdgeInsets.all(10),
+                        underline: const SizedBox.shrink(),
+                        icon: const Icon(Icons.font_download_rounded),
+                      ),
+                    ),
+                    if (Utils.isDesktop) const SizedBox(height: 10),
+                    if (Utils.isDesktop)
+                      Text(
+                        LocalKeys.storage.tr(),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge!
+                            .copyWith(color: colorScheme.onBackground),
+                      ),
+                    if (Utils.isDesktop)
+                      ListTile(
+                        title: Text(LocalKeys.whenEditorIsLaunched.tr()),
+                        trailing: DropdownButton<WhenEditorLaunched>(
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(color: colorScheme.onBackground),
+                          value: settings.whenEditorLaunched,
+                          items: [
+                            DropdownMenuItem(
+                              value:
+                                  WhenEditorLaunched.documentsFromOlderSession,
+                              child: Text(
+                                "${LocalKeys.loadFilesFromOlderSession.tr()}   ",
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: WhenEditorLaunched.newSession,
+                              child: Text(
+                                LocalKeys.openANewSession.tr(),
+                              ),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value == null) return;
+
+                            ref
+                                .read(settingsProvider.notifier)
+                                .changeWhenEditorLaunched(value);
+                          },
+                          alignment: Alignment.centerLeft,
+                          borderRadius: BorderRadius.circular(10),
+                          padding: const EdgeInsets.all(10),
+                          underline: const SizedBox.shrink(),
+                          icon: const Icon(Icons.save_rounded),
+                        ),
+                      ),
+                    const SizedBox(height: 10),
+                    Text(
+                      LocalKeys.language.tr(),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge!
+                          .copyWith(color: colorScheme.onBackground),
+                    ),
+                    ListTile(
+                      title: Text(LocalKeys.language.tr()),
+                      trailing: DropdownButton<Locale>(
+                        value: context.locale,
+                        items: languageKeys.keys
+                            .map(
+                              (lang) => DropdownMenuItem(
+                                value: languageKeys[lang],
+                                child: Text(
+                                  lang.tr(),
+                                  style: TextStyle(
+                                    color: colorScheme.onBackground,
+                                  ),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value == null) return;
+
+                          context.setLocale(value);
+                        },
+                        alignment: Alignment.centerLeft,
+                        borderRadius: BorderRadius.circular(10),
+                        padding: const EdgeInsets.all(10),
+                        underline: const SizedBox.shrink(),
+                        icon: const Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: Icon(
+                            Icons.language_rounded,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -323,12 +329,13 @@ class SettingsWindowBar extends StatelessWidget {
               color: colorScheme.onBackground,
             ),
           ),
-          Expanded(
-            child: WindowCaption(
-              backgroundColor: colorScheme.background,
-              brightness: colorScheme.brightness,
+          if (Utils.isDesktop)
+            Expanded(
+              child: WindowCaption(
+                backgroundColor: colorScheme.background,
+                brightness: colorScheme.brightness,
+              ),
             ),
-          ),
         ],
       ),
     );

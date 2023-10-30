@@ -42,59 +42,63 @@ class DocumentEditingPage extends HookConsumerWidget {
         padding: const EdgeInsets.all(8),
         child: Column(
           children: [
-            SizedBox(
-              height: 35,
-              child: TextField(
-                controller: titleController,
-                style: TextStyle(
-                  fontSize: 25,
-                  color: colorScheme.onBackground,
-                  fontWeight: FontWeight.bold,
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: titleController,
+                    style: TextStyle(
+                      fontSize: 25,
+                      color: colorScheme.onBackground,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    onChanged: (value) {
+                      try {
+                        ref.read(currentDocumentProvider.notifier).state = ref
+                            .read(documentProvider.notifier)
+                            .changeTitle(value, document.uuid);
+                      } catch (error) {
+                        ScaffoldMessenger.of(context).clearSnackBars();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            behavior: SnackBarBehavior.floating,
+                            content: Text(
+                              error.toString(),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    decoration: const InputDecoration.collapsed(
+                      border: InputBorder.none,
+                      hintText: "Title",
+                    ),
+                  ),
                 ),
-                onChanged: (value) {
-                  try {
-                    ref.read(currentDocumentProvider.notifier).state = ref
-                        .read(documentProvider.notifier)
-                        .changeTitle(value, document.uuid);
-                  } catch (error) {
-                    ScaffoldMessenger.of(context).clearSnackBars();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        behavior: SnackBarBehavior.floating,
-                        content: Text(
-                          error.toString(),
-                        ),
-                      ),
-                    );
-                  }
-                },
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  suffix: ExcludeFocus(
-                    child: Container(
-                      width: 25,
-                      height: 25,
-                      margin: const EdgeInsets.only(right: 2.5),
-                      child: Tooltip(
-                        message: """
+                ExcludeFocus(
+                  child: Container(
+                    width: 25,
+                    height: 25,
+                    margin: const EdgeInsets.only(right: 2.5),
+                    child: Tooltip(
+                      message: """
 ${LocalKeys.diskLocation.tr()}: ${document.diskLocation ?? LocalKeys.notSaved.tr()}
 ${LocalKeys.lastSaved.tr()}: ${document.formatDateTime(document.lastSaved) ?? LocalKeys.notSaved.tr()}
 ${LocalKeys.lastModified.tr()}: ${document.formatDateTime(document.lastModified) ?? LocalKeys.notModified.tr()}""",
-                        child: InkWell(
-                          onTap: () {},
-                          hoverColor: Colors.grey.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(5),
-                          child: Icon(
-                            Icons.info_rounded,
-                            size: 18,
-                            color: colorScheme.primary,
-                          ),
+                      child: InkWell(
+                        onTap: () {},
+                        hoverColor: Colors.grey.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(5),
+                        child: Icon(
+                          Icons.info_rounded,
+                          size: 18,
+                          color: colorScheme.primary,
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
             Expanded(
               child: TextField(

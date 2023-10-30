@@ -14,7 +14,7 @@ class WindowButtonBar extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      height: 25,
+      height: 50,
       margin: const EdgeInsets.only(left: 5, top: 5),
       child: Row(
         children: [
@@ -241,7 +241,7 @@ class CustomMenuButton extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return SizedBox(
-      width: 260,
+      width: Utils.isDesktop ? 260 : 120,
       child: Row(
         children: [
           Expanded(
@@ -254,17 +254,18 @@ class CustomMenuButton extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            width: 130,
-            child: Text(
-              shortcut,
-              style: TextStyle(
-                color: colorScheme.primary.withOpacity(0.5),
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+          if (Utils.isDesktop)
+            SizedBox(
+              width: 130,
+              child: Text(
+                shortcut,
+                style: TextStyle(
+                  color: colorScheme.primary.withOpacity(0.5),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

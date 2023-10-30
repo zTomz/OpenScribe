@@ -9,6 +9,7 @@ import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openscribe/utils/provider.dart';
 import 'package:openscribe/utils/settings.dart';
+import 'package:openscribe/utils/utils.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
@@ -21,31 +22,10 @@ void main() async {
   MemoryLocations.applicationDocumentsDirectory =
       (await getApplicationDocumentsDirectory()).path;
 
-  await windowManager.ensureInitialized();
-  await Window.initialize();
-
-  await Window.setEffect(effect: WindowEffect.transparent);
-
-  WindowOptions windowOptions = const WindowOptions(
-    size: Size(800, 600),
-    minimumSize: Size(530, 285),
-    center: true,
-    backgroundColor: Colors.transparent,
-    skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.hidden,
-  );
-
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.setAsFrameless();
-    await windowManager.setHasShadow(false);
-    await windowManager.show();
-    await windowManager.focus();
-    await windowManager.setPreventClose(true);
-  });
-
   AdaptiveThemeMode? savedThemeMode = await AdaptiveTheme.getThemeMode();
-
   final Color? primaryColor = await loadPrimaryColor();
+
+  await initWindow();
 
   runApp(
     ProviderScope(
@@ -74,6 +54,35 @@ void main() async {
       ),
     ),
   );
+}
+
+Future<void> initWindow() async {
+  // Nothing to init
+  if (!Utils.isDesktop) {
+    return;
+  }
+
+  await windowManager.ensureInitialized();
+  await Window.initialize();
+
+  await Window.setEffect(effect: WindowEffect.transparent);
+
+  WindowOptions windowOptions = const WindowOptions(
+    size: Size(800, 600),
+    minimumSize: Size(530, 285),
+    center: true,
+    backgroundColor: Colors.transparent,
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.hidden,
+  );
+
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.setAsFrameless();
+    await windowManager.setHasShadow(false);
+    await windowManager.show();
+    await windowManager.focus();
+    await windowManager.setPreventClose(true);
+  });
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -124,6 +133,11 @@ class _MyAppState extends ConsumerState<MyApp> {
           supportedLocales: context.supportedLocales,
           locale: context.locale,
           builder: (context, child) {
+            // Normal screen for Android and iOS
+            if (!Utils.isDesktop) {
+              return child!;
+            }
+
             return ClipRRect(
               borderRadius: BorderRadius.circular(15),
               child: DragToResizeArea(

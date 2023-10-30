@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openscribe/constants.dart';
 import 'package:openscribe/utils/provider.dart';
+import 'package:openscribe/utils/utils.dart';
 import 'package:uuid/uuid.dart';
 
 @immutable
@@ -94,8 +95,7 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
   Future<Document> openDocument() async {
     final result = await FilePicker.platform.pickFiles(
       dialogTitle: LocalKeys.open.tr(),
-      type: FileType.custom,
-      allowedExtensions: ["odoc", "txt"],
+      type: FileType.any,
     );
 
     if (result == null ||
@@ -236,17 +236,32 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
     }
 
     if (diskLocation == null) {
-      final result = await FilePicker.platform.saveFile(
-        dialogTitle: LocalKeys.saveAs.tr(),
-        fileName: "${doc.title ?? LocalKeys.unknown.tr()}.odoc",
-        type: FileType.custom,
-        allowedExtensions: ["odoc", "txt"],
-      );
+      String? result;
 
-      if (result != null) {
-        diskLocation = result;
+      if (Utils.isDesktop) {
+        result = await FilePicker.platform.saveFile(
+          dialogTitle: LocalKeys.saveAs.tr(),
+          fileName: "${doc.title ?? LocalKeys.unknown.tr()}.odoc",
+          type: FileType.custom,
+          allowedExtensions: ["odoc", "txt"],
+        );
+
+        if (result != null) {
+          diskLocation = result;
+        } else {
+          throw "${LocalKeys.youHaveToPickALocation.tr()}.";
+        }
       } else {
-        throw "${LocalKeys.youHaveToPickALocation.tr()}.";
+        final folderPath = await FilePicker.platform.getDirectoryPath(
+          dialogTitle: "Save ${doc.title ?? LocalKeys.unknown.tr()}.odoc",
+        );
+
+        if (folderPath != null) {
+          result = "$folderPath/${doc.title ?? LocalKeys.unknown.tr()}.odoc";
+          diskLocation = result;
+        } else {
+          throw "${LocalKeys.youHaveToPickALocation.tr()}.";
+        }
       }
     }
 
@@ -277,17 +292,32 @@ class DocumentNotifier extends StateNotifier<List<Document>> {
   Future<Document> saveAs(Document doc) async {
     String? diskLocation;
 
-    final result = await FilePicker.platform.saveFile(
-      dialogTitle: LocalKeys.saveAs.tr(),
-      fileName: "${doc.title ?? LocalKeys.unknown.tr()}.odoc",
-      type: FileType.custom,
-      allowedExtensions: ["odoc", "txt"],
-    );
+    String? result;
 
-    if (result != null) {
-      diskLocation = result;
+    if (Utils.isDesktop) {
+      result = await FilePicker.platform.saveFile(
+        dialogTitle: LocalKeys.saveAs.tr(),
+        fileName: "${doc.title ?? LocalKeys.unknown.tr()}.odoc",
+        type: FileType.custom,
+        allowedExtensions: ["odoc", "txt"],
+      );
+
+      if (result != null) {
+        diskLocation = result;
+      } else {
+        throw "${LocalKeys.youHaveToPickALocation.tr()}.";
+      }
     } else {
-      throw "${LocalKeys.youHaveToPickALocation.tr()}.";
+      final folderPath = await FilePicker.platform.getDirectoryPath(
+        dialogTitle: "Save ${doc.title ?? LocalKeys.unknown.tr()}.odoc",
+      );
+
+      if (folderPath != null) {
+        result = "$folderPath/${doc.title ?? LocalKeys.unknown.tr()}.odoc";
+        diskLocation = result;
+      } else {
+        throw "${LocalKeys.youHaveToPickALocation.tr()}.";
+      }
     }
 
     final file = File(diskLocation);

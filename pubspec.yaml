@@ -24,10 +24,8 @@ dependencies:
   shared_preferences: ^2.2.1
   path_provider: ^2.1.1
   google_fonts: ^6.1.0
-  intl: ^0.18.1
   easy_localization: ^3.0.3
   printing: ^5.11.0
-  syncfusion_flutter_pdf: ^23.1.40
   syncfusion_flutter_pdfviewer: ^23.1.40
   pdf: ^3.10.4
 
@@ -36,6 +34,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
